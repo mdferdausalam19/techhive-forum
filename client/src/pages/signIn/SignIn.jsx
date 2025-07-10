@@ -106,7 +106,7 @@ export default function SignIn() {
         <div>
           <div className="divider">Continue With</div>
           <div className="text-center mb-8 mt-6">
-            <SocialSignIn />
+            <SocialSignIn provider={"Google"} />
           </div>
         </div>
       </div>

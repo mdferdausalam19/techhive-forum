@@ -10,7 +10,7 @@ export default function Navbar() {
     try {
       await signOutUser();
       navigate("/sign-in");
-      toast.success("Sign out successful.");
+      toast.success("Sign out successful!");
     } catch (err) {
       toast.error(err.message);
     }

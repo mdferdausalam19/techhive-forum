@@ -9,8 +9,7 @@ import useAuth from "../../hooks/useAuth";
 
 export default function SignUp() {
   const [showPass, setShowPass] = useState(true);
-  const { createUser, updateUserProfile, googleSignIn, loading, setLoading } =
-    useAuth();
+  const { createUser, updateUserProfile, loading, setLoading } = useAuth();
   const navigate = useNavigate();
 
   const {
