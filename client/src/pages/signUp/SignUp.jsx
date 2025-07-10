@@ -1,20 +1,26 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { TbFidgetSpinner } from "react-icons/tb";
 import toast from "react-hot-toast";
 import SocialSignIn from "../../components/auth/SocialSignIn";
+import useAuth from "../../hooks/useAuth";
 
 export default function SignUp() {
   const [showPass, setShowPass] = useState(true);
+  const { createUser, updateUserProfile, googleSignIn, loading, setLoading } =
+    useAuth();
+  const navigate = useNavigate();
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm();
 
-  const handleSingUp = (data) => {
+  const handleSingUp = async (data) => {
     const { email, fullName, image, password } = data;
     const uppercaseRegex = /[A-Z]/;
     const lowercaseRegex = /[a-z]/;
@@ -34,7 +40,17 @@ export default function SignUp() {
       );
     }
 
-    console.log(email, fullName, image, password);
+    try {
+      setLoading(true);
+      await createUser(email, password);
+      await updateUserProfile(fullName, image);
+      navigate("/");
+      toast.success("Sign up successful!");
+      reset();
+    } catch (err) {
+      setLoading(false);
+      toast.error(err.message);
+    }
   };
 
   return (
@@ -109,7 +125,7 @@ export default function SignUp() {
               />
               <span
                 onClick={() => setShowPass(!showPass)}
-                className="absolute top-4 right-4 cursor-pointer"
+                className="absolute top-4 right-4 cursor-pointer z-2"
               >
                 {showPass ? <FaEyeSlash /> : <FaEye />}
               </span>
@@ -125,7 +141,16 @@ export default function SignUp() {
             </p>
           </div>
           <div className="form-control mt-6">
-            <button className="btn btn-block bg-base-300">Sign Up</button>
+            <button
+              disabled={loading}
+              className="btn btn-block bg-base-300 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <TbFidgetSpinner className="m-auto animate-spin text-xl text-blue-500" />
+              ) : (
+                "Sign Up"
+              )}
+            </button>
           </div>
           <div className="mt-2">
             <p>

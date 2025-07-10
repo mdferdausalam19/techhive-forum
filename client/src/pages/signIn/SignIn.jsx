@@ -1,20 +1,40 @@
 import { useState } from "react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import SocialSignIn from "../../components/auth/SocialSignIn";
+import useAuth from "../../hooks/useAuth";
+import { TbFidgetSpinner } from "react-icons/tb";
+import toast from "react-hot-toast";
 
 export default function SignIn() {
   const [showPass, setShowPass] = useState(true);
+  const { signInUser, loading, setLoading } = useAuth();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm();
 
-  const handleSignIn = (data) => {
+  const handleSignIn = async (data) => {
     const { email, password } = data;
-    console.log(email, password);
+    try {
+      await signInUser(email, password);
+      navigate("/");
+      toast.success("Sign in successful!");
+      reset();
+    } catch (err) {
+      setLoading(false);
+      if (err.code == "auth/invalid-credential") {
+        return toast.error(
+          "Invalid credentials. Please check your email and password."
+        );
+      } else {
+        toast.error(err.message);
+      }
+    }
   };
 
   return (
@@ -54,7 +74,7 @@ export default function SignIn() {
               />
               <span
                 onClick={() => setShowPass(!showPass)}
-                className="absolute top-4 right-4 cursor-pointer"
+                className="absolute top-4 right-4 cursor-pointer z-2"
               >
                 {showPass ? <FaEyeSlash /> : <FaEye />}
               </span>
@@ -66,7 +86,13 @@ export default function SignIn() {
             )}
           </div>
           <div className="form-control mt-6">
-            <button className="btn btn-block bg-base-300 ">Sign In</button>
+            <button className="btn btn-block bg-base-300 ">
+              {loading ? (
+                <TbFidgetSpinner className="m-auto animate-spin text-xl text-blue-500" />
+              ) : (
+                "Sign In"
+              )}
+            </button>
           </div>
           <div className="mt-2">
             <p>
