@@ -8,7 +8,7 @@ import SocialSignIn from "../../components/auth/SocialSignIn";
 import useAuth from "../../hooks/useAuth";
 
 export default function SignUp() {
-  const [showPass, setShowPass] = useState(true);
+  const [showPass, setShowPass] = useState(false);
   const { createUser, updateUserProfile, loading, setLoading } = useAuth();
   const navigate = useNavigate();
 
@@ -53,117 +53,178 @@ export default function SignUp() {
   };
 
   return (
-    <div className="mb-10">
-      <div className="text-center ">
-        <h1 className="text-4xl lg:text-5xl font-bold mt-5 mb-3">Sign Up</h1>
-        <p>Join us today to explore new features!</p>
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="flex justify-center">
+          <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+            <span className="text-white font-bold text-xl">T</span>
+          </div>
+        </div>
+        <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          Join TechHive
+        </h2>
+        <p className="mt-2 text-center text-sm text-gray-600">
+          Create your account to get started
+        </p>
       </div>
-      <div className="card max-w-sm border bg-base-100 shrink-0 shadow-2xl mx-auto mt-5">
-        <form onSubmit={handleSubmit(handleSingUp)} className="card-body">
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text text-base font-medium text-black">
-                Name
-              </span>
-            </label>
-            <input
-              {...register("fullName", { required: true })}
-              type="text"
-              placeholder="Enter your full name"
-              className="input input-bordered w-full"
-            />
-            {errors.fullName && (
-              <span className="text-sm text-red-500">
-                This field is required
-              </span>
-            )}
-          </div>
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text text-base font-medium text-black">
-                Email
-              </span>
-            </label>
-            <input
-              {...register("email", { required: true })}
-              type="email"
-              placeholder="Enter your email"
-              className="input input-bordered w-full"
-            />
-            {errors.email && (
-              <span className="text-sm text-red-500">
-                This field is required
-              </span>
-            )}
-          </div>
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text text-base font-medium text-black">
-                Profile Photo
-              </span>
-            </label>
-            <input
-              {...register("image")}
-              type="text"
-              placeholder="Enter your photo URL"
-              className="input input-bordered w-full"
-            />
-          </div>
-          <div className="form-control">
-            <label className="label">
-              <span className="label-text text-base font-medium text-black">
-                Password
-              </span>
-            </label>
-            <div className="relative">
-              <input
-                {...register("password", { required: true })}
-                type={showPass ? "password" : "text"}
-                placeholder="Create a strong password"
-                className="input input-bordered w-full"
-              />
-              <span
-                onClick={() => setShowPass(!showPass)}
-                className="absolute top-4 right-4 cursor-pointer z-2"
+
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="bg-white py-8 px-6 shadow-lg rounded-lg sm:px-10 border border-gray-200">
+          <form onSubmit={handleSubmit(handleSingUp)} className="space-y-6">
+            <div>
+              <label
+                htmlFor="fullName"
+                className="block text-sm font-medium text-gray-700"
               >
-                {showPass ? <FaEyeSlash /> : <FaEye />}
-              </span>
+                Full Name
+              </label>
+              <div className="mt-1">
+                <input
+                  {...register("fullName", {
+                    required: "Full name is required",
+                  })}
+                  type="text"
+                  autoComplete="name"
+                  placeholder="Enter your full name"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors duration-200"
+                />
+                {errors.fullName && (
+                  <p className="mt-2 text-sm text-red-600">
+                    {errors.fullName.message}
+                  </p>
+                )}
+              </div>
             </div>
-            {errors.password && (
-              <span className="text-sm text-red-500">
-                This field is required
-              </span>
-            )}
-            <p className="text-xs text-gray-500 mt-1">
-              Password must include at least 6 characters, with one uppercase
-              letter and one lowercase letter.
-            </p>
+
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Email address
+              </label>
+              <div className="mt-1">
+                <input
+                  {...register("email", {
+                    required: "Email is required",
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: "Invalid email address",
+                    },
+                  })}
+                  type="email"
+                  autoComplete="email"
+                  placeholder="Enter your email"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors duration-200"
+                />
+                {errors.email && (
+                  <p className="mt-2 text-sm text-red-600">
+                    {errors.email.message}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="image"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Profile Photo URL
+                <span className="text-gray-500 text-xs ml-1">(Optional)</span>
+              </label>
+              <div className="mt-1">
+                <input
+                  {...register("image")}
+                  type="url"
+                  placeholder="Enter your photo URL"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors duration-200"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
+                Password
+              </label>
+              <div className="mt-1 relative">
+                <input
+                  {...register("password", {
+                    required: "Password is required",
+                  })}
+                  type={showPass ? "text" : "password"}
+                  autoComplete="new-password"
+                  placeholder="Create a strong password"
+                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-colors duration-200"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPass(!showPass)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                >
+                  {showPass ? (
+                    <FaEyeSlash className="h-5 w-5" />
+                  ) : (
+                    <FaEye className="h-5 w-5" />
+                  )}
+                </button>
+                {errors.password && (
+                  <p className="mt-2 text-sm text-red-600">
+                    {errors.password.message}
+                  </p>
+                )}
+              </div>
+              <div className="mt-2 text-xs text-gray-500">
+                Password must be at least 6 characters with uppercase and
+                lowercase letters
+              </div>
+            </div>
+
+            <div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+              >
+                {loading ? (
+                  <TbFidgetSpinner className="animate-spin text-xl" />
+                ) : (
+                  "Create Account"
+                )}
+              </button>
+            </div>
+          </form>
+
+          <div className="mt-6">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">
+                  Or continue with
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <SocialSignIn provider={"Google"} />
+            </div>
           </div>
-          <div className="form-control mt-6">
-            <button
-              disabled={loading}
-              className="btn btn-block bg-base-300 disabled:cursor-not-allowed"
-            >
-              {loading ? (
-                <TbFidgetSpinner className="m-auto animate-spin text-xl text-blue-500" />
-              ) : (
-                "Sign Up"
-              )}
-            </button>
-          </div>
-          <div className="mt-2">
-            <p>
+
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">
               Already have an account?{" "}
-              <span className="italic text-blue-500 hover:underline">
-                <Link to={"/sign-in"}>Sign In</Link>
-              </span>
+              <Link
+                to={"/sign-in"}
+                className="font-medium text-blue-600 hover:text-blue-500"
+              >
+                Sign in
+              </Link>
             </p>
-          </div>
-        </form>
-        <div>
-          <div className="divider">Continue With</div>
-          <div className="text-center mb-8 mt-6">
-            <SocialSignIn />
           </div>
         </div>
       </div>
