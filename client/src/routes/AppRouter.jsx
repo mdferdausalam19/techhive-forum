@@ -6,6 +6,7 @@ import SignIn from "../pages/signIn/SignIn";
 import SignUp from "../pages/signUp/SignUp";
 import UserProfile from "../pages/userProfile/UserProfile";
 import PostDetails from "../components/forum/PostDetails";
+import AllPosts from "../pages/forum/AllPosts";
 
 export const router = createBrowserRouter([
   {
@@ -20,6 +21,10 @@ export const router = createBrowserRouter([
       {
         path: "/profile",
         element: <UserProfile />,
+      },
+      {
+        path: "/posts",
+        element: <AllPosts />,
       },
       {
         path: "/post/:id",

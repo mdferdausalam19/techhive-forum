@@ -22,7 +22,6 @@ export default function Navbar() {
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-
           <div className="flex items-center justify-between w-full md:w-auto">
             <Link to="/" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
@@ -71,16 +70,10 @@ export default function Navbar() {
               Home
             </Link>
             <Link
-              to="/"
+              to="/posts"
               className="text-gray-700 hover:text-blue-500 font-medium"
             >
-              Explore
-            </Link>
-            <Link
-              to="/"
-              className="text-gray-700 hover:text-blue-500 font-medium"
-            >
-              About
+              All Posts
             </Link>
           </div>
 
@@ -91,7 +84,10 @@ export default function Navbar() {
               <div className="relative group">
                 <button className="flex items-center space-x-2 text-gray-700 hover:text-blue-500 focus:outline-none rounded-full">
                   <img
-                    src={user.photoURL || "https://via.placeholder.com/32"}
+                    src={
+                      user.photoURL ||
+                      "https://i.ibb.co/9H2PJ7h2/d43801412989.jpg"
+                    }
                     alt="Profile"
                     className="w-8 h-8 rounded-full border"
                   />
@@ -139,11 +135,11 @@ export default function Navbar() {
               <Link to="/" className="block text-gray-700 hover:text-blue-500">
                 Home
               </Link>
-              <Link to="/" className="block text-gray-700 hover:text-blue-500">
-                Explore
-              </Link>
-              <Link to="/" className="block text-gray-700 hover:text-blue-500">
-                About
+              <Link
+                to="/all-posts"
+                className="block text-gray-700 hover:text-blue-500"
+              >
+                All Posts
               </Link>
               {!loading && user && (
                 <>
@@ -162,12 +158,6 @@ export default function Navbar() {
                     className="block text-sm text-gray-700 hover:text-blue-500"
                   >
                     Profile
-                  </Link>
-                  <Link
-                    to="/settings"
-                    className="block text-sm text-gray-700 hover:text-blue-500"
-                  >
-                    Settings
                   </Link>
                   <button
                     onClick={handleSignOut}
