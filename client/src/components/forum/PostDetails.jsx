@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import { samplePosts } from "../../data/samplePosts";
+import CommentSection from "../comment/CommentSection";
 
 export default function PostDetails() {
   const { id } = useParams();
@@ -276,6 +277,10 @@ export default function PostDetails() {
               </button>
             </div>
           </div>
+        </div>
+        {/* Comments Section */}
+        <div className="mt-12">
+          <CommentSection postId={post.id} />
         </div>
       </div>
     </div>
