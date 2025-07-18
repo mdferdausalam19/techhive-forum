@@ -92,8 +92,8 @@ export default function PostDetails() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8">
-            <div className="flex items-center justify-between mb-4">
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/20 backdrop-blur-sm">
+            <div className="flex flex-col md:flex-row items-center justify-between mb-4">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-white/20 backdrop-blur-sm mb-2 md:mb-0">
                 {post.category}
               </span>
               <div className="flex items-center gap-4">
@@ -139,7 +139,7 @@ export default function PostDetails() {
 
           {/* Author Info */}
           <div className="p-6 border-b border-gray-200">
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col md:flex-row items-center gap-4">
               <img
                 src={post.author.avatar}
                 alt={post.author.name}
