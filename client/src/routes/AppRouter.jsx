@@ -8,6 +8,7 @@ import UserProfile from "../pages/userProfile/UserProfile";
 import PostDetails from "../components/forum/PostDetails";
 import AllPosts from "../pages/forum/AllPosts";
 import PrivateRoute from "./PrivateRoute";
+import Membership from "../pages/membership/Membership";
 
 export const router = createBrowserRouter([
   {
@@ -42,6 +43,10 @@ export const router = createBrowserRouter([
             <PostDetails />
           </PrivateRoute>
         ),
+      },
+      {
+        path: "/membership",
+        element: <Membership />,
       },
     ],
   },
