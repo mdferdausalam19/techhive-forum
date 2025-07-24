@@ -9,6 +9,7 @@ import PostDetails from "../components/forum/PostDetails";
 import AllPosts from "../pages/forum/AllPosts";
 import PrivateRoute from "./PrivateRoute";
 import Membership from "../pages/membership/Membership";
+import AIAssistant from "../pages/ai/AIAssistant";
 
 export const router = createBrowserRouter([
   {
@@ -47,6 +48,14 @@ export const router = createBrowserRouter([
       {
         path: "/membership",
         element: <Membership />,
+      },
+      {
+        path: "/ai-assistant",
+        element: (
+          <PrivateRoute>
+            <AIAssistant />
+          </PrivateRoute>
+        ),
       },
     ],
   },

@@ -81,6 +81,12 @@ export default function Navbar() {
             >
               Membership
             </Link>
+            <Link
+              to="/ai-assistant"
+              className="text-gray-700 hover:text-blue-500 font-medium"
+            >
+              AI Assistant
+            </Link>
           </div>
 
           <div className="hidden md:flex items-center space-x-4">
@@ -152,6 +158,12 @@ export default function Navbar() {
                 className="block text-gray-700 hover:text-blue-500"
               >
                 Membership
+              </Link>
+              <Link
+                to="/ai-assistant"
+                className="block text-gray-700 hover:text-blue-500"
+              >
+                AI Assistant
               </Link>
               {!loading && user && (
                 <>
