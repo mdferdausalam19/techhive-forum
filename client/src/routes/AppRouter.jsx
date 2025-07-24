@@ -11,7 +11,7 @@ import PrivateRoute from "./PrivateRoute";
 import Membership from "../pages/membership/Membership";
 import AIAssistant from "../pages/ai/AIAssistant";
 import CreatePost from "../pages/post/CreatePost";
-import EditPost from "../pages/post/EditPost";
+import MyPosts from "../pages/post/MyPosts";
 
 export const router = createBrowserRouter([
   {
@@ -68,10 +68,10 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: "/edit-post/:id",
+        path: "/my-posts",
         element: (
           <PrivateRoute>
-            <EditPost />
+            <MyPosts />
           </PrivateRoute>
         ),
       },
