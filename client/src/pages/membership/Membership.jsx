@@ -56,7 +56,7 @@ export default function Membership() {
           </h1>
           <p className="text-lg max-w-xl mx-auto">
             Unlock exclusive features, dive into AI-enhanced discussions, and
-            enjoy an ad-free, priority-supported community experience.
+            enjoy priority-supported community experience.
           </p>
         </div>
       </div>

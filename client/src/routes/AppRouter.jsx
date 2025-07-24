@@ -10,6 +10,8 @@ import AllPosts from "../pages/forum/AllPosts";
 import PrivateRoute from "./PrivateRoute";
 import Membership from "../pages/membership/Membership";
 import AIAssistant from "../pages/ai/AIAssistant";
+import CreatePost from "../pages/post/CreatePost";
+import EditPost from "../pages/post/EditPost";
 
 export const router = createBrowserRouter([
   {
@@ -54,6 +56,22 @@ export const router = createBrowserRouter([
         element: (
           <PrivateRoute>
             <AIAssistant />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/create-post",
+        element: (
+          <PrivateRoute>
+            <CreatePost />
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "/edit-post/:id",
+        element: (
+          <PrivateRoute>
+            <EditPost />
           </PrivateRoute>
         ),
       },
