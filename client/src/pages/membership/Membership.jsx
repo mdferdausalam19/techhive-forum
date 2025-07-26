@@ -62,7 +62,7 @@ export default function Membership() {
       </div>
 
       {/* Pricing Card */}
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-lg p-8 mb-10 border border-blue-100">
           <div className="flex flex-col md:flex-row items-center justify-between mb-6">
             <div>
@@ -143,8 +143,8 @@ export default function Membership() {
         </div>
 
         {/* FAQ Accordion */}
-        <div className="max-w-2xl mx-auto mb-16">
-          <h4 className="text-xl font-bold text-blue-700 mb-4">
+        <div className="max-w-3xl mx-auto mb-16">
+          <h4 className="text-2xl font-bold text-center text-blue-700 mb-6">
             Frequently Asked Questions
           </h4>
           <div className="space-y-3">

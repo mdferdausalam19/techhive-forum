@@ -114,10 +114,10 @@ export default function AIAssistant() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <div>
+        <div className="flex justify-center items-center mb-10">
+          <div className="text-center">
             <h1 className="text-3xl font-bold text-blue-700">AI Assistant</h1>
             <p className="text-gray-600">
               Your intelligent companion for tech discussions
@@ -125,9 +125,9 @@ export default function AIAssistant() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           {/* Chat Section */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-3">
             <div className="bg-white rounded-lg shadow-lg border border-blue-100 h-96 flex flex-col">
               {/* Messages */}
               <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -188,7 +188,7 @@ export default function AIAssistant() {
           </div>
 
           {/* Post Generator Section */}
-          <div className="lg:col-span-1">
+          <div className="lg:col-span-2">
             {generatedPost ? (
               <PostGenerator
                 post={generatedPost}
