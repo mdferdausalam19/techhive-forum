@@ -20,14 +20,15 @@ export default function Newsletter() {
       setEmail("");
     } catch (error) {
       toast.error("Failed to subscribe. Please try again.");
+      console.error("Failed to subscribe:", error);
     } finally {
       setIsSubscribing(false);
     }
   };
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl shadow-lg p-16 border border-indigo-200 mt-15">
+    <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl shadow-lg p-8 md:p-12 lg:p-16 border border-indigo-200 mt-15">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-800 mb-4">
             📬 Stay Updated with TechHive
