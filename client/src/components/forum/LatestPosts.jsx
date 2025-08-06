@@ -2,6 +2,7 @@ import { samplePosts } from "../../data/samplePosts";
 import { Link } from "react-router";
 import PostList from "./PostList";
 import { useEffect, useState } from "react";
+import LoadingSpinner from "../shared/LoadingSpinner";
 
 export default function LatestPosts() {
   const [posts, setPosts] = useState([]);
@@ -26,15 +27,7 @@ export default function LatestPosts() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          </div>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (error) {
@@ -56,8 +49,8 @@ export default function LatestPosts() {
   }
 
   return (
-    <section className="bg-gradient-to-br from-slate-50 to-blue-50 py-16">
-      <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
             Latest Discussions
