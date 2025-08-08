@@ -25,6 +25,31 @@ async function run() {
   try {
     const database = client.db("techhive");
     const postsCollection = database.collection("posts");
+    const usersCollection = database.collection("users");
+
+    // API route to save user data
+    app.post("/users", async (req, res) => {
+      try {
+        const user = req.body;
+        const query = { email: user.email };
+        const existingUser = await usersCollection.findOne(query);
+        if (existingUser) {
+          return res.status(400).json({
+            message: "User already exists.",
+          });
+        }
+        const result = await usersCollection.insertOne(user);
+        res.status(201).json({
+          message: "User added successfully!",
+          user: result.insertedId,
+        });
+      } catch (err) {
+        console.error("Error adding user: ", err.message);
+        res.status(500).json({
+          message: "Failed to add user.",
+        });
+      }
+    });
 
     // API route to add a new post
     app.post("/posts", async (req, res) => {
