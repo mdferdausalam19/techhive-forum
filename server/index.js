@@ -23,6 +23,26 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
+    const database = client.db("techhive");
+    const postsCollection = database.collection("posts");
+
+    // API route to add a new post
+    app.post("/posts", async (req, res) => {
+      try {
+        const post = req.body;
+        const result = await postsCollection.insertOne(post);
+        res.status(201).json({
+          message: "Post added successfully!",
+          post: result.insertedId,
+        });
+      } catch (err) {
+        console.error("Error adding post: ", err.message);
+        res.status(500).json({
+          message: "Failed to add post.",
+        });
+      }
+    });
+
     console.log("Connected to MongoDB successfully!");
   } catch (err) {
     // Log any errors during connection or runtime

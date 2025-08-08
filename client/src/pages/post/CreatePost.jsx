@@ -4,8 +4,10 @@ import { Navigate, useNavigate } from "react-router";
 import toast from "react-hot-toast";
 import VisibilitySelector from "../../components/post/VisibilitySelector";
 import useAuth from "../../hooks/useAuth";
+import useAxiosCommon from "../../hooks/useAxiosCommon";
 
 export default function CreatePost() {
+  const axiosCommon = useAxiosCommon();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -52,21 +54,15 @@ export default function CreatePost() {
     setIsLoading(true);
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      // Create new post object
       const newPost = {
-        id: `p${Date.now()}`,
         title: data.title,
-        excerpt:
-          data.content.substring(0, 150) +
-          (data.content.length > 150 ? "..." : ""),
+        excerpt: data.excerpt,
         content: data.content,
         author: {
-          id: user?.uid || "u1",
-          name: user?.displayName || "Demo User",
-          avatar: user?.photoURL || "https://i.pravatar.cc/100?img=1",
+          id: user?.uid,
+          name: user?.displayName,
+          avatar:
+            user?.photoURL || "https://i.ibb.co/9H2PJ7h2/d43801412989.jpg",
           badge: isPremium ? "Gold" : "Bronze",
           role: isPremium ? "Premium" : "General",
         },
@@ -83,9 +79,7 @@ export default function CreatePost() {
         category: data.category,
       };
 
-      // In a real app, this would be an API call
-      // For now, we'll just simulate success
-      console.log("New post created:", newPost);
+      await axiosCommon.post("/posts", newPost);
 
       toast.success("Post created successfully!");
       reset();
@@ -150,6 +144,34 @@ export default function CreatePost() {
               {errors.title && (
                 <p className="mt-1 text-sm text-red-600">
                   {errors.title.message}
+                </p>
+              )}
+            </div>
+
+            {/* excerpt */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Excerpt *
+              </label>
+              <textarea
+                {...register("excerpt", {
+                  required: "Excerpt is required",
+                  minLength: {
+                    value: 10,
+                    message: "Excerpt must be at least 10 characters",
+                  },
+                  maxLength: {
+                    value: 100,
+                    message: "Excerpt must be less than 100 characters",
+                  },
+                })}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Enter a descriptive excerpt for your post..."
+                disabled={isLoading}
+              />
+              {errors.excerpt && (
+                <p className="mt-1 text-sm text-red-600">
+                  {errors.excerpt.message}
                 </p>
               )}
             </div>
