@@ -1,20 +1,21 @@
-import { samplePosts } from "../../data/samplePosts";
 import { Link } from "react-router";
 import PostList from "./PostList";
 import { useEffect, useState } from "react";
 import LoadingSpinner from "../shared/LoadingSpinner";
+import useAxiosCommon from "../../hooks/useAxiosCommon";
 
 export default function LatestPosts() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const axiosCommon = useAxiosCommon();
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
         setLoading(true);
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setPosts(samplePosts);
+        const { data } = await axiosCommon.get("/posts");
+        setPosts(data);
       } catch (err) {
         setError("Failed to fetch posts");
         console.error("Error fetching posts:", err);
@@ -24,7 +25,7 @@ export default function LatestPosts() {
     };
 
     fetchPosts();
-  }, []);
+  }, [axiosCommon]);
 
   if (loading) {
     return <LoadingSpinner />;
@@ -64,27 +65,29 @@ export default function LatestPosts() {
 
         <PostList posts={posts.slice(0, 9)} />
 
-        <div className="flex justify-center mt-12">
-          <Link
-            to="/posts"
-            className="inline-flex items-center px-8 py-3 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold shadow-lg hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200"
-          >
-            <span>See All Posts</span>
-            <svg
-              className="ml-2 w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+        {posts.length > 9 && (
+          <div className="flex justify-center mt-12">
+            <Link
+              to="/posts"
+              className="inline-flex items-center px-8 py-3 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold shadow-lg hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17 8l4 4m0 0l-4 4m4-4H3"
-              />
-            </svg>
-          </Link>
-        </div>
+              <span>See All Posts</span>
+              <svg
+                className="ml-2 w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                />
+              </svg>
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );

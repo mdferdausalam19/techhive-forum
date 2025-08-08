@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import PostList from "../../components/forum/PostList";
-import { samplePosts } from "../../data/samplePosts";
 import LoadingSpinner from "../../components/shared/LoadingSpinner";
+import useAxiosCommon from "../../hooks/useAxiosCommon";
 
 export default function AllPosts() {
+  const axiosCommon = useAxiosCommon();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -12,8 +13,8 @@ export default function AllPosts() {
     const fetchPosts = async () => {
       try {
         setLoading(true);
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setPosts(samplePosts);
+        const { data } = await axiosCommon.get("/posts");
+        setPosts(data);
       } catch (err) {
         setError("Failed to fetch posts");
         console.error("Error fetching posts:", err);
@@ -23,7 +24,7 @@ export default function AllPosts() {
     };
 
     fetchPosts();
-  }, []);
+  }, [axiosCommon]);
 
   if (loading) {
     return <LoadingSpinner />;

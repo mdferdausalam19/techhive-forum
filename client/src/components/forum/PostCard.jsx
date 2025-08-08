@@ -2,7 +2,7 @@ import { SlBadge } from "react-icons/sl";
 import { Link } from "react-router";
 
 export default function PostCard({
-  id,
+  _id,
   title,
   excerpt,
   author,
@@ -26,7 +26,7 @@ export default function PostCard({
   };
 
   return (
-    <Link to={`/post/${id}`}>
+    <Link to={`/post/${_id}`}>
       <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200 overflow-hidden group">
         <div className="p-6">
           {/* Category Badge */}
