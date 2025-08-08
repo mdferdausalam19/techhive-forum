@@ -9,7 +9,7 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB dependencies and client initialization
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = process.env.DATABASE_URI;
 
 // Create a new MongoDB client with configuration
@@ -52,6 +52,25 @@ async function run() {
         console.error("Error fetching posts: ", err.message);
         res.status(500).json({
           message: "Failed to fetch posts.",
+        });
+      }
+    });
+
+    // API route to get a single post by ID
+    app.get("/posts/:id", async (req, res) => {
+      try {
+        const { id } = req.params;
+        const post = await postsCollection.findOne({ _id: new ObjectId(id) });
+        if (!post) {
+          return res.status(404).json({
+            message: "Post not found.",
+          });
+        }
+        res.status(200).json(post);
+      } catch (err) {
+        console.error("Error fetching post: ", err.message);
+        res.status(500).json({
+          message: "Failed to fetch post.",
         });
       }
     });
