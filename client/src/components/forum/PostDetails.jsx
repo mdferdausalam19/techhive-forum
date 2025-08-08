@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useParams } from "react-router";
-import { samplePosts } from "../../data/samplePosts";
 import CommentSection from "../comment/CommentSection";
+import useAxiosCommon from "../../hooks/useAxiosCommon";
 
 export default function PostDetails() {
+  const axiosCommon = useAxiosCommon();
   const { id } = useParams();
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -14,9 +15,9 @@ export default function PostDetails() {
       try {
         setLoading(true);
         await new Promise((resolve) => setTimeout(resolve, 800));
-        const foundPost = samplePosts.find((p) => p.id === id);
-        if (foundPost) {
-          setPost(foundPost);
+        const { data } = await axiosCommon.get(`/posts/${id}`);
+        if (data) {
+          setPost(data);
         } else {
           setError("Post not found");
         }
@@ -29,7 +30,7 @@ export default function PostDetails() {
     };
 
     fetchPost();
-  }, [id]);
+  }, [axiosCommon, id]);
 
   if (loading) {
     return (
@@ -76,11 +77,9 @@ export default function PostDetails() {
   const getBadgeColor = (badge) => {
     switch (badge) {
       case "Gold":
-        return "bg-yellow-100 text-yellow-800";
-      case "Silver":
-        return "bg-gray-100 text-gray-800";
-      case "Platinum":
-        return "bg-purple-100 text-purple-800";
+        return "bg-yellow-300 text-yellow-800 border border-yellow-400";
+      case "Bronze":
+        return "bg-amber-600 text-white border border-amber-700";
       default:
         return "bg-blue-100 text-blue-800";
     }
