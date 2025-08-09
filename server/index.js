@@ -63,7 +63,7 @@ async function run() {
         const user = req.body;
         const query = { email };
         const result = await usersCollection.updateOne(query, {
-          $set: user,
+          $set: { ...user },
         });
         res.status(200).json({
           message: "User updated successfully!",

@@ -22,8 +22,8 @@ export default function UserProfile() {
       setLoading(true);
       await updateUserProfile(displayName, photoURL);
       await axiosCommon.put(`/users/${user?.email}`, {
-        displayName,
-        photoURL,
+        fullName: displayName,
+        image: photoURL,
       });
       toast.success("Profile updated!");
       reset(data);
@@ -42,7 +42,7 @@ export default function UserProfile() {
     <div className="max-w-lg mx-auto py-12 px-4">
       <div className="bg-white rounded-xl shadow-lg p-8 flex flex-col items-center border border-blue-100">
         <img
-          src={user?.photoURL}
+          src={user?.photoURL || "https://i.ibb.co/9H2PJ7h2/d43801412989.jpg"}
           alt={user?.displayName || "User"}
           className="w-28 h-28 rounded-full border-4 border-blue-400 object-cover shadow mb-4"
         />
