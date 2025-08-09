@@ -168,6 +168,27 @@ async function run() {
       }
     });
 
+    // API route to update a post
+    app.put("/posts/:id", async (req, res) => {
+      try {
+        const { id } = req.params;
+        const post = req.body;
+        const result = await postsCollection.updateOne(
+          { _id: new ObjectId(id) },
+          { $set: { ...post, _id: new ObjectId(post._id) } }
+        );
+        res.status(200).json({
+          message: "Post updated successfully!",
+          post: result.modifiedCount,
+        });
+      } catch (err) {
+        console.error("Error updating post: ", err.message);
+        res.status(500).json({
+          message: "Failed to update post.",
+        });
+      }
+    });
+
     console.log("Connected to MongoDB successfully!");
   } catch (err) {
     // Log any errors during connection or runtime

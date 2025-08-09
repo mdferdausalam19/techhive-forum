@@ -37,9 +37,12 @@ export default function MyPosts() {
     setShowEditModal(true);
   };
 
-  const handleSavePost = (updatedPost) => {
+  const handleSavePost = async (updatedPost) => {
+    await axiosCommon.put(`/posts/${updatedPost._id}`, updatedPost);
     setPosts((prevPosts) =>
-      prevPosts.map((post) => (post.id === updatedPost.id ? updatedPost : post))
+      prevPosts.map((post) =>
+        post._id === updatedPost._id ? updatedPost : post
+      )
     );
     setShowEditModal(false);
     setEditingPost(null);

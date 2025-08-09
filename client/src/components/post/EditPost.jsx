@@ -7,36 +7,36 @@ import useAuth from "../../hooks/useAuth";
 export default function EditPost({ post, isOpen, onClose, onSave }) {
   const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const isPremium = user?.role === "Premium";
-  
+
   const {
     register,
     handleSubmit,
     formState: { errors },
     watch,
     setValue,
-    reset
+    reset,
   } = useForm({
     defaultValues: {
       title: "",
       content: "",
       tags: "",
       visibility: "public",
-      category: "General Discussion"
-    }
+      category: "General Discussion",
+    },
   });
 
   const visibility = watch("visibility");
 
   const categories = [
     "General Discussion",
-    "Frontend Development", 
+    "Frontend Development",
     "Backend Development",
     "Mobile Development",
     "DevOps",
     "Data Science",
-    "Career Advice"
+    "Career Advice",
   ];
 
   // Pre-fill form when post changes
@@ -44,47 +44,47 @@ export default function EditPost({ post, isOpen, onClose, onSave }) {
     if (post) {
       reset({
         title: post.title || "",
+        excerpt: post.excerpt || "",
         content: post.content || "",
         tags: post.tags ? post.tags.join(", ") : "",
         visibility: post.visibility || "public",
-        category: post.category || "General Discussion"
+        category: post.category || "General Discussion",
       });
     }
   }, [post, reset]);
 
-  const onSubmit = async (data) => {
-    // Check if user is trying to set private visibility without premium
+  const onSubmit = (data) => {
     if (data.visibility === "private" && !isPremium) {
       toast.error("Private posts are only available to Premium members!");
       return;
     }
 
     setIsLoading(true);
-    
+
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Create updated post object
       const updatedPost = {
         ...post,
         title: data.title,
-        excerpt: data.content.substring(0, 150) + (data.content.length > 150 ? "..." : ""),
+        excerpt:
+          data.excerpt.substring(0, 150) +
+          (data.excerpt.length > 150 ? "..." : ""),
         content: data.content,
-        tags: data.tags.split(",").map(tag => tag.trim()).filter(tag => tag),
+        tags: data.tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter((tag) => tag),
         visibility: data.visibility,
         category: data.category,
-        // Keep original author, date, etc.
       };
 
-      // Call the onSave callback
+      console.log(updatedPost);
+
       if (onSave) {
         onSave(updatedPost);
       }
-      
+
       toast.success("Post updated successfully!");
       onClose();
-      
     } catch {
       toast.error("Failed to update post. Please try again.");
     } finally {
@@ -113,8 +113,18 @@ export default function EditPost({ post, isOpen, onClose, onSave }) {
             className="text-gray-400 hover:text-gray-600 transition"
             disabled={isLoading}
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         </div>
@@ -128,17 +138,53 @@ export default function EditPost({ post, isOpen, onClose, onSave }) {
             </label>
             <input
               type="text"
-              {...register("title", { 
+              {...register("title", {
                 required: "Title is required",
-                minLength: { value: 10, message: "Title must be at least 10 characters" },
-                maxLength: { value: 100, message: "Title must be less than 100 characters" }
+                minLength: {
+                  value: 10,
+                  message: "Title must be at least 10 characters",
+                },
+                maxLength: {
+                  value: 100,
+                  message: "Title must be less than 100 characters",
+                },
               })}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="Enter a descriptive title for your post..."
               disabled={isLoading}
             />
             {errors.title && (
-              <p className="mt-1 text-sm text-red-600">{errors.title.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.title.message}
+              </p>
+            )}
+          </div>
+
+          {/* excerpt */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Excerpt *
+            </label>
+            <textarea
+              {...register("excerpt", {
+                required: "Excerpt is required",
+                minLength: {
+                  value: 10,
+                  message: "Excerpt must be at least 10 characters",
+                },
+                maxLength: {
+                  value: 100,
+                  message: "Excerpt must be less than 100 characters",
+                },
+              })}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="Enter a descriptive excerpt for your post..."
+              disabled={isLoading}
+            />
+            {errors.excerpt && (
+              <p className="mt-1 text-sm text-red-600">
+                {errors.excerpt.message}
+              </p>
             )}
           </div>
 
@@ -152,12 +198,16 @@ export default function EditPost({ post, isOpen, onClose, onSave }) {
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               disabled={isLoading}
             >
-              {categories.map(category => (
-                <option key={category} value={category}>{category}</option>
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
               ))}
             </select>
             {errors.category && (
-              <p className="mt-1 text-sm text-red-600">{errors.category.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.category.message}
+              </p>
             )}
           </div>
 
@@ -167,9 +217,12 @@ export default function EditPost({ post, isOpen, onClose, onSave }) {
               Content *
             </label>
             <textarea
-              {...register("content", { 
+              {...register("content", {
                 required: "Content is required",
-                minLength: { value: 50, message: "Content must be at least 50 characters" }
+                minLength: {
+                  value: 50,
+                  message: "Content must be at least 50 characters",
+                },
               })}
               rows={10}
               className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -177,7 +230,9 @@ export default function EditPost({ post, isOpen, onClose, onSave }) {
               disabled={isLoading}
             />
             {errors.content && (
-              <p className="mt-1 text-sm text-red-600">{errors.content.message}</p>
+              <p className="mt-1 text-sm text-red-600">
+                {errors.content.message}
+              </p>
             )}
           </div>
 
@@ -223,9 +278,25 @@ export default function EditPost({ post, isOpen, onClose, onSave }) {
             >
               {isLoading ? (
                 <>
-                  <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-4 w-4 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
                   </svg>
                   Saving...
                 </>
