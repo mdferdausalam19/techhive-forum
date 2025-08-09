@@ -137,7 +137,9 @@ export default function PostCard({
           {/* Author Info */}
           <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
             <img
-              src={author.avatar}
+              src={
+                author.avatar || "https://i.ibb.co/9H2PJ7h2/d43801412989.jpg"
+              }
               alt={author.name}
               className="w-8 h-8 rounded-full border-2 border-white shadow-sm"
             />

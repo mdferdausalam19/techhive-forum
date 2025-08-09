@@ -56,23 +56,49 @@ async function run() {
       }
     });
 
-    // API route to update user by email
+    // API route to update user by email and reflect changes in their posts
     app.put("/users/:email", async (req, res) => {
       try {
         const { email } = req.params;
-        const user = req.body;
-        const query = { email };
-        const result = await usersCollection.updateOne(query, {
-          $set: { ...user },
-        });
+        const updateData = req.body;
+
+        // Find the existing user
+        const existingUser = await usersCollection.findOne({ email });
+        if (!existingUser) {
+          return res.status(404).json({ message: "User not found." });
+        }
+
+        // Update user in users collection
+        const userUpdateResult = await usersCollection.updateOne(
+          { email },
+          { $set: updateData }
+        );
+
+        // Create updated author object with new data
+        const updatedAuthor = {
+          id: existingUser.uid,
+          name: updateData.name ?? existingUser.name,
+          avatar: updateData.avatar ?? existingUser.avatar,
+          badge: updateData.badge ?? existingUser.badge,
+          role: updateData.role ?? existingUser.role,
+        };
+
+        // Update all posts created by this user using Firebase UID
+        const postsUpdateResult = await postsCollection.updateMany(
+          { "author.id": existingUser.uid },
+          { $set: { author: updatedAuthor } }
+        );
+
         res.status(200).json({
-          message: "User updated successfully!",
-          user: result.modifiedCount,
+          message: "User and posts updated successfully!",
+          userUpdated: userUpdateResult.modifiedCount,
+          postsUpdated: postsUpdateResult.modifiedCount,
         });
-      } catch (err) {
-        console.error("Error updating user: ", err.message);
+      } catch (error) {
+        console.error("Error updating user:", error);
         res.status(500).json({
-          message: "Failed to update user.",
+          message: "Failed to update user and posts.",
+          error: error.message,
         });
       }
     });

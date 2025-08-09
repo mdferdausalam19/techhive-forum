@@ -1,4 +1,5 @@
 import PostCard from "./PostCard";
+import { Link } from "react-router";
 
 export default function PostList({ posts = [] }) {
   if (!posts.length) {
@@ -25,9 +26,12 @@ export default function PostList({ posts = [] }) {
         <p className="text-gray-500 mb-4">
           Be the first to share your thoughts with the community
         </p>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+        <Link
+          to="/create-post"
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+        >
           Create First Post
-        </button>
+        </Link>
       </div>
     );
   }

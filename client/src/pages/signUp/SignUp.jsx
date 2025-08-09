@@ -43,13 +43,15 @@ export default function SignUp() {
 
     try {
       setLoading(true);
-      await createUser(email, password);
+      const { user } = await createUser(email, password);
       await updateUserProfile(fullName, image);
       await axiosCommon.post("/users", {
+        uid: user.uid,
+        name: fullName,
         email,
-        fullName,
-        image,
+        avatar: image || "https://i.ibb.co/9H2PJ7h2/d43801412989.jpg",
         role: "General",
+        badge: "Bronze",
       });
       navigate("/");
       toast.success("Sign up successful!");

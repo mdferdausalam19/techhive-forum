@@ -17,10 +17,12 @@ export default function SocialSignIn({ provider }) {
       setLoading(true);
       const { user } = await socialProviderSignIn();
       await axiosCommon.post("/users", {
+        uid: user.uid,
         email: user.email,
-        fullName: user.displayName,
-        image: user.photoURL,
+        name: user.displayName,
+        avatar: user.photoURL || "https://i.ibb.co/9H2PJ7h2/d43801412989.jpg",
         role: "General",
+        badge: "Bronze",
       });
       navigate("/");
       toast.success("Sign in successful!");

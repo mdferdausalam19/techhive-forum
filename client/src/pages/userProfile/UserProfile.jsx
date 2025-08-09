@@ -22,8 +22,8 @@ export default function UserProfile() {
       setLoading(true);
       await updateUserProfile(displayName, photoURL);
       await axiosCommon.put(`/users/${user?.email}`, {
-        fullName: displayName,
-        image: photoURL,
+        name: displayName,
+        avatar: photoURL || "https://i.ibb.co/9H2PJ7h2/d43801412989.jpg",
       });
       toast.success("Profile updated!");
       reset(data);
