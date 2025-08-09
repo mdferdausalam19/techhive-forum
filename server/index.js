@@ -189,6 +189,25 @@ async function run() {
       }
     });
 
+    // API route to delete a post
+    app.delete("/posts/:id", async (req, res) => {
+      try {
+        const { id } = req.params;
+        const result = await postsCollection.deleteOne({
+          _id: new ObjectId(id),
+        });
+        res.status(200).json({
+          message: "Post deleted successfully!",
+          post: result.deletedCount,
+        });
+      } catch (err) {
+        console.error("Error deleting post: ", err.message);
+        res.status(500).json({
+          message: "Failed to delete post.",
+        });
+      }
+    });
+
     console.log("Connected to MongoDB successfully!");
   } catch (err) {
     // Log any errors during connection or runtime

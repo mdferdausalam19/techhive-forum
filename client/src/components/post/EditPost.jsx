@@ -77,13 +77,9 @@ export default function EditPost({ post, isOpen, onClose, onSave }) {
         category: data.category,
       };
 
-      console.log(updatedPost);
-
       if (onSave) {
         onSave(updatedPost);
       }
-
-      toast.success("Post updated successfully!");
       onClose();
     } catch {
       toast.error("Failed to update post. Please try again.");

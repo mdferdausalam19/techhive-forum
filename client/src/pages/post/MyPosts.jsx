@@ -46,6 +46,7 @@ export default function MyPosts() {
     );
     setShowEditModal(false);
     setEditingPost(null);
+    toast.success("Post updated successfully!");
   };
 
   const handleDeletePost = (post) => {
@@ -55,8 +56,10 @@ export default function MyPosts() {
 
   const confirmDeletePost = async () => {
     setIsDeleting(true);
-    await new Promise((resolve) => setTimeout(resolve, 800)); // Simulate API
-    setPosts((prevPosts) => prevPosts.filter((p) => p.id !== deletingPost.id));
+    await axiosCommon.delete(`/posts/${deletingPost._id}`);
+    setPosts((prevPosts) =>
+      prevPosts.filter((p) => p._id !== deletingPost._id)
+    );
     setShowDeleteModal(false);
     setIsDeleting(false);
     setDeletingPost(null);
