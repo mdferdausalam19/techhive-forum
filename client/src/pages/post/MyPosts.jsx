@@ -4,9 +4,10 @@ import toast from "react-hot-toast";
 import EditPost from "../../components/post/EditPost";
 import DeletePostModal from "../../components/post/DeletePostModal";
 import useAuth from "../../hooks/useAuth";
-import { samplePosts } from "../../data/samplePosts";
+import useAxiosCommon from "../../hooks/useAxiosCommon";
 
 export default function MyPosts() {
+  const axiosCommon = useAxiosCommon();
   const { user } = useAuth();
   const [posts, setPosts] = useState([]);
   const [editingPost, setEditingPost] = useState(null);
@@ -16,73 +17,20 @@ export default function MyPosts() {
   const [deletingPost, setDeletingPost] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Filter posts by current user (mock implementation)
   useEffect(() => {
-    setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      // In a real app, this would fetch user's posts from API
-      const userPosts = samplePosts.filter(
-        (post) =>
-          post.author.id === user?.uid || post.author.name === user?.displayName
-      );
-
-      if (userPosts.length === 0) {
-        const dummyPosts = [
-          {
-            id: "my1",
-            title: "My First React Project Experience",
-            excerpt:
-              "Sharing my journey of building my first React application...",
-            content:
-              "Building my first React project was both challenging and rewarding. I learned about components, state management, and the importance of proper project structure. Here are the key lessons I learned along the way...",
-            author: {
-              id: user?.uid || "current-user",
-              name: user?.displayName || "You",
-              avatar: user?.photoURL || "https://i.pravatar.cc/100?img=1",
-              badge: "Bronze",
-              role: "General",
-            },
-            tags: ["react", "beginner", "experience"],
-            date: "2025-07-20T10:30:00Z",
-            upvotes: 15,
-            downvotes: 2,
-            likes: 15,
-            comments: 8,
-            visibility: "public",
-            category: "Frontend Development",
-          },
-          {
-            id: "my2",
-            title: "Tips for Better Code Organization",
-            excerpt:
-              "Best practices I've learned for organizing code in large projects...",
-            content:
-              "After working on several projects, I've discovered some valuable tips for keeping code organized and maintainable. These practices have saved me countless hours of debugging and refactoring.",
-            author: {
-              id: user?.uid || "current-user",
-              name: user?.displayName || "You",
-              avatar: user?.photoURL || "https://i.pravatar.cc/100?img=1",
-              badge: "Bronze",
-              role: "General",
-            },
-            tags: ["coding", "best-practices", "organization"],
-            date: "2025-07-18T14:15:00Z",
-            upvotes: 23,
-            downvotes: 1,
-            likes: 23,
-            comments: 12,
-            visibility: "public",
-            category: "General Discussion",
-          },
-        ];
-        setPosts(dummyPosts);
-      } else {
-        setPosts(userPosts);
+    async function fetchPosts() {
+      try {
+        setLoading(true);
+        const { data } = await axiosCommon.get(`/posts/user/${user?.uid}`);
+        setPosts(data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
-    }, 1000);
-  }, [user]);
+    }
+    fetchPosts();
+  }, [user, axiosCommon]);
 
   const handleEditPost = (post) => {
     setEditingPost(post);
@@ -272,7 +220,7 @@ export default function MyPosts() {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {posts.map((post) => (
-                    <tr key={post.id} className="hover:bg-gray-50">
+                    <tr key={post._id} className="hover:bg-gray-50">
                       <td className="px-6 py-4">
                         <div className="max-w-xs">
                           <div className="text-sm font-medium text-gray-900 truncate">
@@ -340,7 +288,7 @@ export default function MyPosts() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex space-x-2">
                           <Link
-                            to={`/post/${post.id}`}
+                            to={`/post/${post._id}`}
                             className="text-blue-600 hover:text-blue-900"
                           >
                             View
