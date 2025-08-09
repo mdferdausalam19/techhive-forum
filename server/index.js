@@ -152,6 +152,22 @@ async function run() {
       }
     });
 
+    // API route to fetch all posts for a specific user
+    app.get("/posts/user/:uid", async (req, res) => {
+      try {
+        const { uid } = req.params;
+        const posts = await postsCollection
+          .find({ "author.id": uid })
+          .toArray();
+        res.status(200).json(posts);
+      } catch (err) {
+        console.error("Error fetching posts: ", err.message);
+        res.status(500).json({
+          message: "Failed to fetch posts.",
+        });
+      }
+    });
+
     console.log("Connected to MongoDB successfully!");
   } catch (err) {
     // Log any errors during connection or runtime
