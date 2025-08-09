@@ -56,6 +56,27 @@ async function run() {
       }
     });
 
+    // API route to update user by email
+    app.put("/users/:email", async (req, res) => {
+      try {
+        const { email } = req.params;
+        const user = req.body;
+        const query = { email };
+        const result = await usersCollection.updateOne(query, {
+          $set: user,
+        });
+        res.status(200).json({
+          message: "User updated successfully!",
+          user: result.modifiedCount,
+        });
+      } catch (err) {
+        console.error("Error updating user: ", err.message);
+        res.status(500).json({
+          message: "Failed to update user.",
+        });
+      }
+    });
+
     // API route to add a new post
     app.post("/posts", async (req, res) => {
       try {
