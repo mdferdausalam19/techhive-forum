@@ -4,16 +4,24 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router";
 import { useState } from "react";
 import { TbFidgetSpinner } from "react-icons/tb";
+import useAxiosCommon from "../../hooks/useAxiosCommon";
 
 export default function SocialSignIn({ provider }) {
   const [loading, setLoading] = useState(false);
   const { googleSignIn } = useAuth();
   const navigate = useNavigate();
+  const axiosCommon = useAxiosCommon();
 
   const handleSocialSignIn = async (socialProviderSignIn) => {
     try {
       setLoading(true);
-      await socialProviderSignIn();
+      const { user } = await socialProviderSignIn();
+      await axiosCommon.post("/users", {
+        email: user.email,
+        fullName: user.displayName,
+        image: user.photoURL,
+        role: "General",
+      });
       navigate("/");
       toast.success("Sign in successful!");
     } catch (err) {

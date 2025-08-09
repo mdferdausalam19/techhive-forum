@@ -6,11 +6,13 @@ import { TbFidgetSpinner } from "react-icons/tb";
 import toast from "react-hot-toast";
 import SocialSignIn from "../../components/auth/SocialSignIn";
 import useAuth from "../../hooks/useAuth";
+import useAxiosCommon from "../../hooks/useAxiosCommon";
 
 export default function SignUp() {
   const [showPass, setShowPass] = useState(false);
   const { createUser, updateUserProfile, loading, setLoading } = useAuth();
   const navigate = useNavigate();
+  const axiosCommon = useAxiosCommon();
 
   const {
     register,
@@ -43,6 +45,12 @@ export default function SignUp() {
       setLoading(true);
       await createUser(email, password);
       await updateUserProfile(fullName, image);
+      await axiosCommon.post("/users", {
+        email,
+        fullName,
+        image,
+        role: "General",
+      });
       navigate("/");
       toast.success("Sign up successful!");
       reset();

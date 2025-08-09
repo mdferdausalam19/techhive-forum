@@ -32,13 +32,18 @@ async function run() {
       try {
         const user = req.body;
         const query = { email: user.email };
+
+        // if existing user try to sign in again
         const existingUser = await usersCollection.findOne(query);
         if (existingUser) {
-          return res.status(400).json({
-            message: "User already exists.",
+          return res.status(200).json({
+            message: "Registered user found!",
           });
         }
-        const result = await usersCollection.insertOne(user);
+        const result = await usersCollection.insertOne({
+          ...user,
+          timestamp: Date.now(),
+        });
         res.status(201).json({
           message: "User added successfully!",
           user: result.insertedId,
