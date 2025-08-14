@@ -1,84 +1,65 @@
-import { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import CommentSection from "../comment/CommentSection";
 import useAxiosCommon from "../../hooks/useAxiosCommon";
 import toast from "react-hot-toast";
+import useAuth from "../../hooks/useAuth";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import LoadingSpinner from "../../components/shared/LoadingSpinner";
+import { useState } from "react";
 
 export default function PostDetails() {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   const axiosCommon = useAxiosCommon();
   const { id } = useParams();
-  const [post, setPost] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [voteStatus, setVoteStatus] = useState({
+    upvoted: false,
+    downvoted: false,
+  });
 
-  useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        setLoading(true);
-        await new Promise((resolve) => setTimeout(resolve, 800));
-        const { data } = await axiosCommon.get(`/posts/${id}`);
-        if (data) {
-          setPost(data);
-        } else {
-          setError("Post not found");
-        }
-      } catch (err) {
-        setError("Failed to fetch post");
-        console.error("Error fetching post:", err);
-      } finally {
-        setLoading(false);
-      }
+  const {
+    data: post = {},
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["post", id],
+    queryFn: async () => {
+      const { data } = await axiosCommon.get(`/posts/${id}`);
+      setVoteStatus({
+        upvoted: data.upvotes.includes(user?.uid),
+        downvoted: data.downvotes.includes(user?.uid),
+      });
+      return data;
+    },
+  });
+
+  const { mutateAsync, isLoading: voteLoading } = useMutation({
+    mutationFn: async (voteInfo) =>
+      await axiosCommon.patch(`/posts/${post._id}/vote`, voteInfo),
+    onSuccess: ({ data }) => {
+      toast.success(data.message);
+      queryClient.invalidateQueries({ queryKey: ["post", id] });
+    },
+    onError: () => {
+      toast.error("Failed to vote post. Please try again.");
+    },
+  });
+
+  const handleVote = async (type) => {
+    const voteInfo = {
+      user_id: user?.uid,
+      type,
     };
-
-    fetchPost();
-  }, [axiosCommon, id]);
-
-  const handleUpvote = async () => {
     try {
-      setPost((prevPost) => ({
-        ...prevPost,
-        upvotes: prevPost.upvotes + 1,
-      }));
-      await axiosCommon.put(`/posts/${post._id}/upvote`, {
-        ...post,
-        upvotes: post.upvotes + 1,
-      });
-      toast.success("Post upvoted successfully!");
+      await mutateAsync(voteInfo);
     } catch (err) {
-      console.error("Error upvoting post: ", err.message);
-      toast.error("Failed to upvote post. Please try again.");
+      console.error("Error voting post: ", err.message);
+      toast.error("Failed to vote post. Please try again.");
     }
   };
 
-  const handleDownvote = async () => {
-    try {
-      setPost((prevPost) => ({
-        ...prevPost,
-        upvotes: prevPost.upvotes - 1,
-        downvotes: prevPost.downvotes + 1,
-      }));
-      await axiosCommon.put(`/posts/${post._id}/downvote`, {
-        ...post,
-        upvotes: post.upvotes - 1,
-        downvotes: post.downvotes + 1,
-      });
-      toast.success("Post downvoted successfully!");
-    } catch (err) {
-      console.error("Error downvoting post: ", err.message);
-      toast.error("Failed to downvote post. Please try again.");
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-16">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="flex justify-center items-center py-20">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          </div>
-        </div>
-      </div>
-    );
+  if (isLoading || voteLoading) {
+    return <LoadingSpinner />;
   }
 
   if (error) {
@@ -147,7 +128,7 @@ export default function PostDetails() {
                       d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 21.364l-7.682-7.682a4.5 4.5 0 010-6.364z"
                     />
                   </svg>
-                  <span>{post.likes} Likes</span>
+                  <span>{post.likes.length} Likes</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <svg
@@ -213,8 +194,9 @@ export default function PostDetails() {
               </div>
               <div className="flex items-center gap-2">
                 <button
-                  onClick={handleUpvote}
-                  className="flex items-center gap-1 px-3 py-1 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition cursor-pointer"
+                  disabled={voteStatus.upvoted}
+                  onClick={() => handleVote("upvote")}
+                  className="flex items-center gap-1 px-3 py-1 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <svg
                     className="w-4 h-4"
@@ -229,11 +211,12 @@ export default function PostDetails() {
                       d="M7 11l5-5m0 0l5 5m-5-5v12"
                     />
                   </svg>
-                  <span className="font-medium">{post.upvotes}</span>
+                  <span className="font-medium">{post.upvotes.length}</span>
                 </button>
                 <button
-                  onClick={handleDownvote}
-                  className="flex items-center gap-1 px-3 py-1 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition cursor-pointer"
+                  disabled={voteStatus.downvoted}
+                  onClick={() => handleVote("downvote")}
+                  className="flex items-center gap-1 px-3 py-1 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <svg
                     className="w-4 h-4"
@@ -248,7 +231,7 @@ export default function PostDetails() {
                       d="M17 13l-5 5m0 0l-5-5m5 5V6"
                     />
                   </svg>
-                  <span className="font-medium">{post.downvotes}</span>
+                  <span className="font-medium">{post.downvotes.length}</span>
                 </button>
               </div>
             </div>

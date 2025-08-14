@@ -71,9 +71,9 @@ export default function CreatePost() {
           .map((tag) => tag.trim())
           .filter((tag) => tag),
         date: new Date().toISOString(),
-        upvotes: 0,
-        downvotes: 0,
-        likes: 0,
+        upvotes: [],
+        downvotes: [],
+        likes: [],
         comments: 0,
         visibility: data.visibility,
         category: data.category,

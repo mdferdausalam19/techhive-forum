@@ -26,6 +26,7 @@ async function run() {
     const database = client.db("techhive");
     const postsCollection = database.collection("posts");
     const usersCollection = database.collection("users");
+    const votesCollection = database.collection("votes");
 
     // API route to save user data
     app.post("/users", async (req, res) => {
@@ -208,44 +209,56 @@ async function run() {
       }
     });
 
-    // API route to upvote a post
-    app.put("/posts/:id/upvote", async (req, res) => {
+    // API route to vote a post
+    app.patch("/posts/:id/vote", async (req, res) => {
       try {
         const { id } = req.params;
-        const post = req.body;
-        const result = await postsCollection.updateOne(
-          { _id: new ObjectId(id) },
-          { $set: { ...post, _id: new ObjectId(post._id) } }
-        );
-        res.status(200).json({
-          message: "Post upvoted successfully!",
-          post: result.modifiedCount,
-        });
-      } catch (err) {
-        console.error("Error upvoting post: ", err.message);
-        res.status(500).json({
-          message: "Failed to upvote post.",
-        });
-      }
-    });
+        const voteInfo = req.body;
+        if (voteInfo.type === "upvote") {
+          const isdownvoted = await postsCollection.findOne({
+            _id: new ObjectId(id),
+            downvotes: voteInfo.user_id,
+          });
 
-    // API route to downvote a post
-    app.put("/posts/:id/downvote", async (req, res) => {
-      try {
-        const { id } = req.params;
-        const post = req.body;
-        const result = await postsCollection.updateOne(
-          { _id: new ObjectId(id) },
-          { $set: { ...post, _id: new ObjectId(post._id) } }
-        );
-        res.status(200).json({
-          message: "Post downvoted successfully!",
-          post: result.modifiedCount,
-        });
+          if (isdownvoted) {
+            await postsCollection.updateOne(
+              { _id: new ObjectId(id) },
+              { $pull: { downvotes: voteInfo.user_id } }
+            );
+          }
+
+          const result = await postsCollection.updateOne(
+            { _id: new ObjectId(id) },
+            { $push: { upvotes: voteInfo.user_id } }
+          );
+          res.status(200).json({
+            message: "Post upvoted successfully!",
+            post: result.modifiedCount,
+          });
+        } else {
+          const isupvoted = await postsCollection.findOne({
+            _id: new ObjectId(id),
+            upvotes: voteInfo.user_id,
+          });
+          if (isupvoted) {
+            await postsCollection.updateOne(
+              { _id: new ObjectId(id) },
+              { $pull: { upvotes: voteInfo.user_id } }
+            );
+          }
+          const result = await postsCollection.updateOne(
+            { _id: new ObjectId(id) },
+            { $push: { downvotes: voteInfo.user_id } }
+          );
+          res.status(200).json({
+            message: "Post downvoted successfully!",
+            post: result.modifiedCount,
+          });
+        }
       } catch (err) {
-        console.error("Error downvoting post: ", err.message);
+        console.error("Error voting post: ", err.message);
         res.status(500).json({
-          message: "Failed to downvote post.",
+          message: "Failed to vote post.",
         });
       }
     });

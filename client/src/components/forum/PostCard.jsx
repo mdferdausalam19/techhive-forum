@@ -7,9 +7,9 @@ export default function PostCard({
   excerpt,
   author,
   date,
-  likes = 0,
-  upvotes = 0,
-  downvotes = 0,
+  likes = [],
+  upvotes = [],
+  downvotes = [],
   comments = 0,
   tags = [],
   category = "General",
@@ -80,7 +80,7 @@ export default function PostCard({
                     d="M7 11l5-5m0 0l5 5m-5-5v12"
                   />
                 </svg>
-                <span>{upvotes}</span>
+                <span>{upvotes.length}</span>
               </div>
               <div className="flex items-center gap-1">
                 <svg
@@ -97,7 +97,7 @@ export default function PostCard({
                   />
                 </svg>
 
-                <span>{downvotes}</span>
+                <span>{downvotes.length}</span>
               </div>
               <div className="flex items-center gap-1">
                 <svg
@@ -113,7 +113,7 @@ export default function PostCard({
                     d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 21.364l-7.682-7.682a4.5 4.5 0 010-6.364z"
                   />
                 </svg>
-                <span>{likes}</span>
+                <span>{likes.length}</span>
               </div>
               <div className="flex items-center gap-1">
                 <svg
