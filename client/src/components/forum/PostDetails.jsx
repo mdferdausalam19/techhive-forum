@@ -50,6 +50,25 @@ export default function PostDetails() {
     }
   };
 
+  const handleDownvote = async () => {
+    try {
+      setPost((prevPost) => ({
+        ...prevPost,
+        upvotes: prevPost.upvotes - 1,
+        downvotes: prevPost.downvotes + 1,
+      }));
+      await axiosCommon.put(`/posts/${post._id}/downvote`, {
+        ...post,
+        upvotes: post.upvotes - 1,
+        downvotes: post.downvotes + 1,
+      });
+      toast.success("Post downvoted successfully!");
+    } catch (err) {
+      console.error("Error downvoting post: ", err.message);
+      toast.error("Failed to downvote post. Please try again.");
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-16">
@@ -212,7 +231,10 @@ export default function PostDetails() {
                   </svg>
                   <span className="font-medium">{post.upvotes}</span>
                 </button>
-                <button className="flex items-center gap-1 px-3 py-1 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition cursor-pointer">
+                <button
+                  onClick={handleDownvote}
+                  className="flex items-center gap-1 px-3 py-1 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition cursor-pointer"
+                >
                   <svg
                     className="w-4 h-4"
                     fill="none"
