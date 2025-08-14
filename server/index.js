@@ -208,6 +208,27 @@ async function run() {
       }
     });
 
+    // API route to upvote a post
+    app.put("/posts/:id/upvote", async (req, res) => {
+      try {
+        const { id } = req.params;
+        const post = req.body;
+        const result = await postsCollection.updateOne(
+          { _id: new ObjectId(id) },
+          { $set: { ...post, _id: new ObjectId(post._id) } }
+        );
+        res.status(200).json({
+          message: "Post upvoted successfully!",
+          post: result.modifiedCount,
+        });
+      } catch (err) {
+        console.error("Error upvoting post: ", err.message);
+        res.status(500).json({
+          message: "Failed to upvote post.",
+        });
+      }
+    });
+
     console.log("Connected to MongoDB successfully!");
   } catch (err) {
     // Log any errors during connection or runtime

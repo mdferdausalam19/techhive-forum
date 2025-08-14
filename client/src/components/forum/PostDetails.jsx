@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router";
 import CommentSection from "../comment/CommentSection";
 import useAxiosCommon from "../../hooks/useAxiosCommon";
+import toast from "react-hot-toast";
 
 export default function PostDetails() {
   const axiosCommon = useAxiosCommon();
@@ -31,6 +32,23 @@ export default function PostDetails() {
 
     fetchPost();
   }, [axiosCommon, id]);
+
+  const handleUpvote = async () => {
+    try {
+      setPost((prevPost) => ({
+        ...prevPost,
+        upvotes: prevPost.upvotes + 1,
+      }));
+      await axiosCommon.put(`/posts/${post._id}/upvote`, {
+        ...post,
+        upvotes: post.upvotes + 1,
+      });
+      toast.success("Post upvoted successfully!");
+    } catch (err) {
+      console.error("Error upvoting post: ", err.message);
+      toast.error("Failed to upvote post. Please try again.");
+    }
+  };
 
   if (loading) {
     return (
@@ -175,7 +193,10 @@ export default function PostDetails() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <button className="flex items-center gap-1 px-3 py-1 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition">
+                <button
+                  onClick={handleUpvote}
+                  className="flex items-center gap-1 px-3 py-1 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition cursor-pointer"
+                >
                   <svg
                     className="w-4 h-4"
                     fill="none"
@@ -191,7 +212,7 @@ export default function PostDetails() {
                   </svg>
                   <span className="font-medium">{post.upvotes}</span>
                 </button>
-                <button className="flex items-center gap-1 px-3 py-1 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition">
+                <button className="flex items-center gap-1 px-3 py-1 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 transition cursor-pointer">
                   <svg
                     className="w-4 h-4"
                     fill="none"
