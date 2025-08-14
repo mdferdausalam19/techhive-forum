@@ -263,6 +263,41 @@ async function run() {
       }
     });
 
+    // API route to like a post
+    app.patch("/posts/:id/like", async (req, res) => {
+      try {
+        const { id } = req.params;
+        const likeInfo = req.body;
+        const isLiked = await postsCollection.findOne({
+          _id: new ObjectId(id),
+          likes: likeInfo.user_id,
+        });
+        if (isLiked) {
+          const result = await postsCollection.updateOne(
+            { _id: new ObjectId(id) },
+            { $pull: { likes: likeInfo.user_id } }
+          );
+          return res.status(200).json({
+            message: "Post unliked successfully!",
+            post: result.modifiedCount,
+          });
+        }
+        const result = await postsCollection.updateOne(
+          { _id: new ObjectId(id) },
+          { $push: { likes: likeInfo.user_id } }
+        );
+        res.status(200).json({
+          message: "Post liked successfully!",
+          post: result.modifiedCount,
+        });
+      } catch (err) {
+        console.error("Error liking post: ", err.message);
+        res.status(500).json({
+          message: "Failed to like post.",
+        });
+      }
+    });
+
     console.log("Connected to MongoDB successfully!");
   } catch (err) {
     // Log any errors during connection or runtime

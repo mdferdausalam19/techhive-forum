@@ -6,6 +6,7 @@ import useAuth from "../../hooks/useAuth";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import LoadingSpinner from "../../components/shared/LoadingSpinner";
 import { useState } from "react";
+import { FaHeart } from "react-icons/fa";
 
 export default function PostDetails() {
   const { user } = useAuth();
@@ -16,6 +17,7 @@ export default function PostDetails() {
     upvoted: false,
     downvoted: false,
   });
+  const [likeStatus, setLikeStatus] = useState(false);
 
   const {
     data: post = {},
@@ -29,11 +31,12 @@ export default function PostDetails() {
         upvoted: data.upvotes.includes(user?.uid),
         downvoted: data.downvotes.includes(user?.uid),
       });
+      setLikeStatus(data.likes.includes(user?.uid));
       return data;
     },
   });
 
-  const { mutateAsync, isLoading: voteLoading } = useMutation({
+  const { mutateAsync: voteMutateAsync, isLoading: voteLoading } = useMutation({
     mutationFn: async (voteInfo) =>
       await axiosCommon.patch(`/posts/${post._id}/vote`, voteInfo),
     onSuccess: ({ data }) => {
@@ -45,20 +48,44 @@ export default function PostDetails() {
     },
   });
 
+  const { mutateAsync: likeMutateAsync, isLoading: likeLoading } = useMutation({
+    mutationFn: async (likeInfo) =>
+      await axiosCommon.patch(`/posts/${post._id}/like`, likeInfo),
+    onSuccess: ({ data }) => {
+      toast.success(data.message);
+      queryClient.invalidateQueries({ queryKey: ["post", id] });
+    },
+    onError: () => {
+      toast.error("Failed to like post. Please try again.");
+    },
+  });
+
   const handleVote = async (type) => {
     const voteInfo = {
       user_id: user?.uid,
       type,
     };
     try {
-      await mutateAsync(voteInfo);
+      await voteMutateAsync(voteInfo);
     } catch (err) {
       console.error("Error voting post: ", err.message);
       toast.error("Failed to vote post. Please try again.");
     }
   };
 
-  if (isLoading || voteLoading) {
+  const handleLike = async () => {
+    const likeInfo = {
+      user_id: user?.uid,
+    };
+    try {
+      await likeMutateAsync(likeInfo);
+    } catch (err) {
+      console.error("Error liking post: ", err.message);
+      toast.error("Failed to like post. Please try again.");
+    }
+  };
+
+  if (isLoading || voteLoading || likeLoading) {
     return <LoadingSpinner />;
   }
 
@@ -267,21 +294,16 @@ export default function PostDetails() {
           <div className="p-6 bg-gray-50 border-t border-gray-200">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                    />
-                  </svg>
-                  <span>Like</span>
+                <button
+                  onClick={handleLike}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition cursor-pointer"
+                >
+                  {likeStatus ? (
+                    <FaHeart className="w-4 h-4 text-red-500" />
+                  ) : (
+                    <FaHeart className="w-4 h-4" />
+                  )}
+                  <span>{likeStatus ? "Liked" : "Like"}</span>
                 </button>
               </div>
               <button className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
