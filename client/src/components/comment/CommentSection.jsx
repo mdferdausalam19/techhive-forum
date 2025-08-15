@@ -1,21 +1,43 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import CommentItem from "./CommentItem";
 import ReportModal from "./ReportModal";
 import toast from "react-hot-toast";
 import AddCommentModal from "./AddCommentModal";
-import sampleComments from "../../data/sampleComments";
 import ReplyModal from "./ReplyModal";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import useAxiosCommon from "../../hooks/useAxiosCommon";
+import useAuth from "../../hooks/useAuth";
+import LoadingSpinner from "../shared/LoadingSpinner";
 
-export default function CommentSection({ postId }) {
-  const [comments, setComments] = useState([]);
-  useEffect(() => {
-    setComments(sampleComments.filter((c) => c.postId === postId));
-  }, [postId]);
+export default function CommentSection({ post }) {
   const [showReport, setShowReport] = useState(false);
   const [reportCommentId, setReportCommentId] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newComment, setNewComment] = useState("");
-  const [adding, setAdding] = useState(false);
+  const queryClient = useQueryClient();
+  const axiosCommon = useAxiosCommon();
+  const { user } = useAuth();
+
+  const { data: comments = [], isLoading: commentsLoading } = useQuery({
+    queryKey: ["comments", post._id],
+    queryFn: async () => {
+      const { data } = await axiosCommon.get(`/posts/${post._id}/comments`);
+      return data;
+    },
+  });
+
+  const { mutateAsync: commentMutateAsync, isLoading: commentAdding } =
+    useMutation({
+      mutationFn: async (commentInfo) =>
+        await axiosCommon.post(`/posts/${post._id}/comment`, commentInfo),
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["comments", post._id] });
+        queryClient.invalidateQueries({ queryKey: ["post", post._id] });
+      },
+      onError: () => {
+        toast.error("Failed to comment on post. Please try again.");
+      },
+    });
 
   const handleReport = (commentId) => {
     setReportCommentId(commentId);
@@ -26,31 +48,28 @@ export default function CommentSection({ postId }) {
     setShowAddModal(true);
   };
 
-  const handleSubmitComment = () => {
-    if (!newComment.trim()) return;
-    setAdding(true);
-    setTimeout(() => {
-      setComments((prev) => [
-        {
-          id: `c${Date.now()}`,
-          postId,
-          parentId: null,
-          replyTo: null,
-          author: {
-            id: "u1",
-            name: "Demo User",
-            avatar: "https://i.pravatar.cc/48?img=1",
-          },
-          content: newComment,
-          date: new Date().toLocaleString(),
-        },
-        ...prev,
-      ]);
-      setNewComment("");
+  const handleSubmitComment = async () => {
+    const commentInfo = {
+      post_id: post._id,
+      author: {
+        id: user?.uid,
+        name: user?.displayName,
+        avatar: user?.photoURL,
+      },
+      comment: newComment,
+      parent_id: null,
+      reply_to: null,
+      timestamp: Date.now(),
+    };
+    try {
+      await commentMutateAsync(commentInfo);
+      toast.success("Comment added successfully!");
       setShowAddModal(false);
-      setAdding(false);
-      toast.success("Comment added!");
-    }, 600);
+      setNewComment("");
+    } catch (err) {
+      console.error("Error commenting on post: ", err.message);
+      toast.error("Failed to comment on post. Please try again.");
+    }
   };
 
   const [showReplyModal, setShowReplyModal] = useState(false);
@@ -64,38 +83,40 @@ export default function CommentSection({ postId }) {
     setShowReplyModal(true);
   };
 
-  const handleReplySubmit = () => {
+  const handleReplySubmit = async () => {
     if (!replyText.trim() || !replyingToComment) return;
     setReplying(true);
-    setTimeout(() => {
-      setComments((prev) => [
-        {
-          id: `r${Date.now()}`,
-          postId,
-          parentId: replyingToComment.id,
-          replyTo: replyingToComment.author.name,
-          author: {
-            id: "u1",
-            name: "Demo User",
-            avatar: "https://i.pravatar.cc/48?img=1",
-          },
-          content: replyText,
-          date: new Date().toLocaleString(),
-        },
-        ...prev,
-      ]);
+    const commentInfo = {
+      post_id: post._id,
+      author: {
+        id: user?.uid,
+        name: user?.displayName,
+        avatar: user?.photoURL,
+      },
+      comment: replyText,
+      parent_id: replyingToComment.id,
+      reply_to: replyingToComment.author?.name,
+      timestamp: Date.now(),
+    };
+    try {
+      await commentMutateAsync(commentInfo);
+      toast.success("Reply added successfully!");
       setShowReplyModal(false);
       setReplying(false);
-      toast.success("Reply added!");
-    }, 600);
+    } catch (err) {
+      console.error("Error replying to comment: ", err.message);
+      toast.error("Failed to reply to comment. Please try again.");
+    }
   };
+
+  if (commentsLoading || commentAdding) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <div className="mt-8">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-2xl font-bold text-gray-800">
-          Comments
-        </h3>
+        <h3 className="text-2xl font-bold text-gray-800">Comments</h3>
         <button
           className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
           onClick={handleAddComment}
@@ -111,10 +132,10 @@ export default function CommentSection({ postId }) {
         ) : (
           comments
             .slice()
-            .sort((a, b) => new Date(a.date) - new Date(b.date))
+            .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp))
             .map((comment) => (
               <CommentItem
-                key={comment.id}
+                key={comment._id}
                 comment={comment}
                 onReport={handleReport}
                 onReply={() => handleReplyClick(comment)}
@@ -133,12 +154,11 @@ export default function CommentSection({ postId }) {
       />
       {showAddModal && (
         <AddCommentModal
-          postId={postId}
           setShowAddModal={setShowAddModal}
-          adding={adding}
+          adding={commentAdding}
           newComment={newComment}
           setNewComment={setNewComment}
-          handleSubmitComment={handleSubmitComment}
+          onSubmitComment={handleSubmitComment}
         />
       )}
       {showReport && (

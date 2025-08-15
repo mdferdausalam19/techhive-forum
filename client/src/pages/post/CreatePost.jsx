@@ -74,7 +74,7 @@ export default function CreatePost() {
         upvotes: [],
         downvotes: [],
         likes: [],
-        comments: 0,
+        comments: [],
         visibility: data.visibility,
         category: data.category,
       };

@@ -1,10 +1,9 @@
 export default function AddCommentModal({
-  postId,
   setShowAddModal,
   adding,
   newComment,
   setNewComment,
-  handleSubmitComment,
+  onSubmitComment,
 }) {
   return (
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
@@ -36,7 +35,7 @@ export default function AddCommentModal({
           </button>
           <button
             className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
-            onClick={handleSubmitComment}
+            onClick={onSubmitComment}
             disabled={adding || !newComment.trim()}
           >
             {adding ? "Adding..." : "Submit"}

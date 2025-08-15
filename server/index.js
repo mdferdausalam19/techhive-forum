@@ -26,7 +26,7 @@ async function run() {
     const database = client.db("techhive");
     const postsCollection = database.collection("posts");
     const usersCollection = database.collection("users");
-    const votesCollection = database.collection("votes");
+    const commentsCollection = database.collection("comments");
 
     // API route to save user data
     app.post("/users", async (req, res) => {
@@ -294,6 +294,48 @@ async function run() {
         console.error("Error liking post: ", err.message);
         res.status(500).json({
           message: "Failed to like post.",
+        });
+      }
+    });
+
+    // API route to get comments for a post
+    app.get("/posts/:id/comments", async (req, res) => {
+      try {
+        const { id } = req.params;
+        const comments = await commentsCollection
+          .find({ post_id: id })
+          .toArray();
+        res.status(200).json(comments);
+      } catch (err) {
+        console.error("Error fetching comments: ", err.message);
+        res.status(500).json({
+          message: "Failed to fetch comments.",
+        });
+      }
+    });
+
+    // API route to comment on a post
+    app.post("/posts/:id/comment", async (req, res) => {
+      try {
+        const commentInfo = req.body;
+        const result = await commentsCollection.insertOne(commentInfo);
+        const post = await postsCollection.findOne({
+          _id: new ObjectId(commentInfo.post_id),
+        });
+        if (post) {
+          const result = await postsCollection.updateOne(
+            { _id: new ObjectId(commentInfo.post_id) },
+            { $push: { comments: commentInfo.author.id } }
+          );
+        }
+        res.status(200).json({
+          message: "Comment added successfully!",
+          comment: result.insertedId,
+        });
+      } catch (err) {
+        console.error("Error commenting on post: ", err.message);
+        res.status(500).json({
+          message: "Failed to comment on post.",
         });
       }
     });
