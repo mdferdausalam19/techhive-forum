@@ -39,11 +39,6 @@ export default function CommentSection({ post }) {
       },
     });
 
-  const handleReport = (commentId) => {
-    setReportCommentId(commentId);
-    setShowReport(true);
-  };
-
   const handleAddComment = () => {
     setShowAddModal(true);
   };
@@ -70,6 +65,11 @@ export default function CommentSection({ post }) {
       console.error("Error commenting on post: ", err.message);
       toast.error("Failed to comment on post. Please try again.");
     }
+  };
+
+  const handleReport = (commentId) => {
+    setShowReport(true);
+    setReportCommentId(commentId);
   };
 
   const [showReplyModal, setShowReplyModal] = useState(false);
@@ -109,7 +109,38 @@ export default function CommentSection({ post }) {
     }
   };
 
-  if (commentsLoading || commentAdding) {
+  const { mutateAsync: reportMutateAsync, isLoading: reportLoading } =
+    useMutation({
+      mutationFn: async (reportInfo) =>
+        await axiosCommon.post(
+          `/comments/${reportInfo.commentId}/report`,
+          reportInfo
+        ),
+      onSuccess: () => {
+        toast.success("Comment reported successfully!");
+        setShowReport(false);
+      },
+      onError: () => {
+        toast.error("Failed to report comment. Please try again.");
+      },
+    });
+
+  const handleReportSubmit = async (commentId, reason, details) => {
+    const reportInfo = {
+      commentId,
+      reason,
+      details,
+    };
+    if (!reason || !details) return;
+    try {
+      await reportMutateAsync(reportInfo);
+    } catch (err) {
+      console.error("Error reporting comment: ", err.message);
+      toast.error("Failed to report comment. Please try again.");
+    }
+  };
+
+  if (commentsLoading || commentAdding || reportLoading) {
     return <LoadingSpinner />;
   }
 
@@ -165,6 +196,8 @@ export default function CommentSection({ post }) {
         <ReportModal
           commentId={reportCommentId}
           onClose={() => setShowReport(false)}
+          onSubmitReport={handleReportSubmit}
+          loading={reportLoading}
         />
       )}
     </div>

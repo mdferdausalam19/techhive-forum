@@ -27,6 +27,7 @@ async function run() {
     const postsCollection = database.collection("posts");
     const usersCollection = database.collection("users");
     const commentsCollection = database.collection("comments");
+    const reportsCollection = database.collection("reports");
 
     // API route to save user data
     app.post("/users", async (req, res) => {
@@ -336,6 +337,33 @@ async function run() {
         console.error("Error commenting on post: ", err.message);
         res.status(500).json({
           message: "Failed to comment on post.",
+        });
+      }
+    });
+
+    // API route to report a comment
+    app.post("/comments/:id/report", async (req, res) => {
+      try {
+        const { id } = req.params;
+        const reportInfo = req.body;
+        const result = await reportsCollection.insertOne(reportInfo);
+        const comment = await commentsCollection.findOne({
+          _id: new ObjectId(id),
+        });
+        if (comment) {
+          const result = await commentsCollection.updateOne(
+            { _id: new ObjectId(id) },
+            { $push: { reports: reportInfo.user_id } }
+          );
+        }
+        res.status(200).json({
+          message: "Comment reported successfully!",
+          comment: result.insertedId,
+        });
+      } catch (err) {
+        console.error("Error reporting comment: ", err.message);
+        res.status(500).json({
+          message: "Failed to report comment.",
         });
       }
     });

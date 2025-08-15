@@ -1,19 +1,18 @@
 import { useState } from "react";
-import toast from "react-hot-toast";
 
-export default function ReportModal({ commentId, onClose }) {
+export default function ReportModal({
+  commentId,
+  onClose,
+  onSubmitReport,
+  loading,
+}) {
   const [reason, setReason] = useState("Spam");
   const [details, setDetails] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
-    setTimeout(() => {
-      toast.success("Comment reported successfully!");
-      setLoading(false);
-      onClose();
-    }, 1000);
+    onSubmitReport(commentId, reason, details);
+    onClose();
   };
 
   return (
@@ -53,6 +52,7 @@ export default function ReportModal({ commentId, onClose }) {
               className="w-full border rounded px-2 py-1 focus:ring-2 focus:ring-red-200"
               rows={3}
               value={details}
+              required
               onChange={(e) => setDetails(e.target.value)}
             />
           </div>

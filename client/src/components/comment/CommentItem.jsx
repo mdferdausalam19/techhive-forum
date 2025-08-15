@@ -41,7 +41,7 @@ export default function CommentItem({ comment, onReport, onReply }) {
         </button>
         <button
           className="text-gray-500 hover:underline hover:text-red-500"
-          onClick={() => onReport(comment.id)}
+          onClick={() => onReport(comment._id)}
         >
           Report
         </button>
