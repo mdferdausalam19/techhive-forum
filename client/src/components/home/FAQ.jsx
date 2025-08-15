@@ -12,9 +12,14 @@ const faqItems = [
       "Yes, TechHive is completely free to use! You can browse discussions, ask questions, and participate in the community without any cost.",
   },
   {
-    question: "How can I post a question?",
+    question: "What payment methods are supported?",
     answer:
-      'After logging in, click the "Create Post" button on the forum page. Make sure to provide a clear title and detailed description of your question to get the best responses.',
+      "You can pay using any major credit/debit card or securely via Stripe. Your Premium access is activated instantly.",
+  },
+  {
+    question: "Can I cancel anytime?",
+    answer:
+      "No, you can't cancel your subscription because it's a one-time purchase.",
   },
 ];
 
