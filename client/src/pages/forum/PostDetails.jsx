@@ -1,5 +1,5 @@
 import { useParams } from "react-router";
-import CommentSection from "../comment/CommentSection";
+import CommentSection from "../../components/comment/CommentSection";
 import useAxiosCommon from "../../hooks/useAxiosCommon";
 import toast from "react-hot-toast";
 import useAuth from "../../hooks/useAuth";
@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import LoadingSpinner from "../../components/shared/LoadingSpinner";
 import { useState } from "react";
 import { FaHeart } from "react-icons/fa";
+import ShareModal from "../../components/forum/ShareModal";
 
 export default function PostDetails() {
   const { user } = useAuth();
@@ -18,6 +19,7 @@ export default function PostDetails() {
     downvoted: false,
   });
   const [likeStatus, setLikeStatus] = useState(false);
+  const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   const {
     data: post = {},
@@ -83,6 +85,10 @@ export default function PostDetails() {
       console.error("Error liking post: ", err.message);
       toast.error("Failed to like post. Please try again.");
     }
+  };
+
+  const getPostUrl = () => {
+    return `${window.location.origin}/posts/${id}`;
   };
 
   if (isLoading || voteLoading || likeLoading) {
@@ -306,7 +312,10 @@ export default function PostDetails() {
                   <span>{likeStatus ? "Liked" : "Like"}</span>
                 </button>
               </div>
-              <button className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+              <button
+                onClick={() => setIsShareModalOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+              >
                 <svg
                   className="w-4 h-4"
                   fill="none"
@@ -330,6 +339,11 @@ export default function PostDetails() {
           <CommentSection post={post} />
         </div>
       </div>
+      <ShareModal
+        isOpen={isShareModalOpen}
+        onClose={() => setIsShareModalOpen(false)}
+        postUrl={getPostUrl()}
+      />
     </div>
   );
 }

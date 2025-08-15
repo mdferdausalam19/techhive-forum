@@ -5,7 +5,7 @@ import Home from "../pages/home/Home";
 import SignIn from "../pages/signIn/SignIn";
 import SignUp from "../pages/signUp/SignUp";
 import UserProfile from "../pages/userProfile/UserProfile";
-import PostDetails from "../components/forum/PostDetails";
+import PostDetails from "../pages/forum/PostDetails";
 import AllPosts from "../pages/forum/AllPosts";
 import PrivateRoute from "./PrivateRoute";
 import Membership from "../pages/membership/Membership";

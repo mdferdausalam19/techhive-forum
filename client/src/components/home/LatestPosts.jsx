@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import PostList from "./PostList";
+import PostList from "../forum/PostList";
 import { useEffect, useState } from "react";
 import LoadingSpinner from "../shared/LoadingSpinner";
 import useAxiosCommon from "../../hooks/useAxiosCommon";

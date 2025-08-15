@@ -1,4 +1,4 @@
-import LatestPosts from "../../components/forum/LatestPosts";
+import LatestPosts from "../../components/home/LatestPosts";
 import HeroBanner from "../../components/home/HeroBanner";
 import Newsletter from "../../components/home/Newsletter";
 import FAQ from "../../components/home/FAQ";
