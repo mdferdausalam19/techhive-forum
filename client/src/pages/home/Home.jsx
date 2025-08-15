@@ -2,6 +2,7 @@ import LatestPosts from "../../components/forum/LatestPosts";
 import HeroBanner from "../../components/home/HeroBanner";
 import Newsletter from "../../components/home/Newsletter";
 import FAQ from "../../components/home/FAQ";
+import Testimonials from "../../components/home/Testimonials";
 
 export default function Home() {
   return (
@@ -11,6 +12,7 @@ export default function Home() {
         <div className="py-16">
           <LatestPosts />
           <Newsletter />
+          <Testimonials />
           <FAQ />
         </div>
       </div>

@@ -2,28 +2,12 @@ import { useState } from "react";
 
 const features = [
   { name: "Access to Public Forums", free: true, premium: true },
+  { name: "Create Posts", free: true, premium: true },
   { name: "Commenting on Posts", free: true, premium: true },
-  { name: "AI Assistant (Limited Access)", free: false, premium: true },
-  { name: "Post Creation Limit (5/month)", free: true, premium: true },
-  { name: "Premium Forums Access", free: false, premium: true },
+  { name: "AI Assistant", free: false, premium: true },
   { name: "Priority Support", free: false, premium: true },
   { name: "Early Access to Features", free: false, premium: true },
   { name: "Gold Profile Badge", free: false, premium: true },
-];
-
-const testimonials = [
-  {
-    name: "Sarah K.",
-    quote:
-      "Premium gave me access to deep discussions and an ad-free experience. It’s worth every penny!",
-    avatar: "https://i.pravatar.cc/100?img=5",
-  },
-  {
-    name: "Mike T.",
-    quote:
-      "Smart Discussions and Gold badge make me feel like part of an exclusive tech tribe!",
-    avatar: "https://i.pravatar.cc/100?img=8",
-  },
 ];
 
 const faqs = [
@@ -75,9 +59,9 @@ export default function Membership() {
             </div>
             <div className="text-right">
               <span className="text-4xl font-extrabold text-blue-600 mr-2">
-                $7
+                $499
               </span>
-              <span className="text-lg text-gray-500">/month</span>
+              <span className="text-lg text-gray-500">/life-time</span>
             </div>
           </div>
           <div className="overflow-x-auto">
@@ -116,29 +100,6 @@ export default function Membership() {
             <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-lg text-lg shadow transition">
               Upgrade Now
             </button>
-          </div>
-        </div>
-
-        {/* Testimonials */}
-        <div className="max-w-3xl mx-auto mb-12">
-          <h3 className="text-2xl font-bold text-center text-blue-700 mb-6">
-            What Our Members Say
-          </h3>
-          <div className="flex flex-col md:flex-row gap-6 justify-center">
-            {testimonials.map((t) => (
-              <div
-                key={t.name}
-                className="flex-1 bg-white rounded-lg shadow p-6 border border-blue-100 flex flex-col items-center"
-              >
-                <img
-                  src={t.avatar}
-                  alt={t.name}
-                  className="w-16 h-16 rounded-full mb-3 border-2 border-blue-200"
-                />
-                <p className="text-gray-700 italic mb-2">"{t.quote}"</p>
-                <span className="font-semibold text-blue-700">{t.name}</span>
-              </div>
-            ))}
           </div>
         </div>
 

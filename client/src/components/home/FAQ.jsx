@@ -26,58 +26,56 @@ export default function FAQ() {
   };
 
   return (
-    <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Frequently Asked Questions
-          </h2>
-          <p className="text-lg text-gray-600">
-            Find quick answers to common questions about TechHive
-          </p>
-        </div>
+    <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="text-center mb-12">
+        <h2 className="text-3xl font-bold text-gray-900 mb-4">
+          Frequently Asked Questions
+        </h2>
+        <p className="text-lg text-gray-600">
+          Find quick answers to common questions about TechHive
+        </p>
+      </div>
 
-        <div className="space-y-4">
-          {faqItems.map((item, index) => (
-            <div
-              key={index}
-              className="border border-gray-200 rounded-lg overflow-hidden"
+      <div className="space-y-4">
+        {faqItems.map((item, index) => (
+          <div
+            key={index}
+            className="border border-gray-200 rounded-lg overflow-hidden"
+          >
+            <button
+              className={`flex justify-between items-center w-full px-6 py-4 text-left focus:outline-none ${
+                openIndex === index ? "bg-indigo-50" : "hover:bg-gray-50"
+              } border border-indigo-200`}
+              onClick={() => toggleFAQ(index)}
             >
-              <button
-                className={`flex justify-between items-center w-full px-6 py-4 text-left focus:outline-none ${
-                  openIndex === index ? "bg-indigo-50" : "hover:bg-gray-50"
+              <span className="text-lg font-medium text-gray-900">
+                {item.question}
+              </span>
+              <svg
+                className={`w-5 h-5 text-indigo-600 transition-transform duration-200 ${
+                  openIndex === index ? "transform rotate-180" : ""
                 }`}
-                onClick={() => toggleFAQ(index)}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
               >
-                <span className="text-lg font-medium text-gray-900">
-                  {item.question}
-                </span>
-                <svg
-                  className={`w-5 h-5 text-indigo-600 transition-transform duration-200 ${
-                    openIndex === index ? "transform rotate-180" : ""
-                  }`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M19 9l-7 7-7-7"
-                  />
-                </svg>
-              </button>
-              <div
-                className={`px-6 overflow-hidden transition-all duration-300 ${
-                  openIndex === index ? "max-h-48 p-6" : "max-h-0"
-                }`}
-              >
-                <p className="text-gray-600">{item.answer}</p>
-              </div>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+            <div
+              className={`px-6 overflow-hidden transition-all duration-300 ${
+                openIndex === index ? "max-h-48 p-6" : "max-h-0"
+              }`}
+            >
+              <p className="text-gray-600">{item.answer}</p>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     </section>
   );
