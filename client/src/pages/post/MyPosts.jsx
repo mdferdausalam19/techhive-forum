@@ -118,14 +118,20 @@ export default function MyPosts() {
             <div className="flex items-center w-full justify-between">
               <div className="flex flex-col items-center flex-1">
                 <span className="text-lg font-bold text-green-600">
-                  {posts.reduce((sum, post) => sum + (post.upvotes || 0), 0)}
+                  {posts.reduce(
+                    (sum, post) => sum + (post.upvotes.length || 0),
+                    0
+                  )}
                 </span>
                 <span className="text-xs text-gray-500">Upvotes</span>
               </div>
               <div className="w-px h-8 bg-gray-200 mx-4"></div>
               <div className="flex flex-col items-center flex-1">
                 <span className="text-lg font-bold text-red-500">
-                  {posts.reduce((sum, post) => sum + (post.downvotes || 0), 0)}
+                  {posts.reduce(
+                    (sum, post) => sum + (post.downvotes.length || 0),
+                    0
+                  )}
                 </span>
                 <span className="text-xs text-gray-500">Downvotes</span>
               </div>
@@ -136,14 +142,20 @@ export default function MyPosts() {
             <div className="flex items-center w-full justify-between">
               <div className="flex flex-col items-center flex-1">
                 <span className="text-lg font-bold text-pink-600">
-                  {posts.reduce((sum, post) => sum + (post.likes || 0), 0)}
+                  {posts.reduce(
+                    (sum, post) => sum + (post.likes.length || 0),
+                    0
+                  )}
                 </span>
                 <span className="text-xs text-gray-500">Likes</span>
               </div>
               <div className="w-px h-8 bg-gray-200 mx-4"></div>
               <div className="flex flex-col items-center flex-1">
                 <span className="text-lg font-bold text-purple-600">
-                  {posts.reduce((sum, post) => sum + (post.comments || 0), 0)}
+                  {posts.reduce(
+                    (sum, post) => sum + (post.comments.length || 0),
+                    0
+                  )}
                 </span>
                 <span className="text-xs text-gray-500">Comments</span>
               </div>

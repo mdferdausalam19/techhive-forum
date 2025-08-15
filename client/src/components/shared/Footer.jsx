@@ -7,6 +7,7 @@ import {
   FaMapMarkerAlt,
   FaPhone,
   FaEnvelope,
+  FaRobot,
 } from "react-icons/fa";
 
 export default function Footer() {
@@ -19,10 +20,10 @@ export default function Footer() {
           {/* About Section */}
           <div className="col-span-1">
             <h3 className="text-xl font-bold mb-4 flex items-center">
-              <span className="bg-white text-blue-700 rounded-full w-8 h-8 flex items-center justify-center mr-2">
-                T
-              </span>
-              TechHive
+              <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mr-2">
+                <FaRobot className="h-6 w-6 text-white" />
+              </div>
+              <span>TechHive</span>
             </h3>
             <p className="text-blue-100 text-sm mb-4">
               A vibrant community for tech enthusiasts to share knowledge, ask
