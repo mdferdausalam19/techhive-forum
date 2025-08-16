@@ -28,7 +28,7 @@ export default function Newsletter() {
 
   return (
     <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="bg-gradient-to-r from-indigo-50 to-blue-50 rounded-xl shadow-lg p-8 md:p-12 lg:p-16 border border-indigo-200 mt-15">
+      <div className="bg-gradient-to-r from-indigo-50 to-blue-50/40 rounded-xl shadow-lg p-8 md:p-12 lg:p-16 border border-indigo-200 mt-15">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-800 mb-4">
             📬 Stay Updated with TechHive
@@ -70,7 +70,7 @@ export default function Newsletter() {
           <button
             type="submit"
             disabled={isSubscribing}
-            className="px-8 py-3 bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-medium rounded-lg hover:from-indigo-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-70 transition-all duration-200 shadow-md hover:shadow-lg"
+            className="px-8 py-3 bg-gradient-to-r from-indigo-600/90 to-blue-600/90 text-white font-medium rounded-lg hover:from-indigo-700 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-70 transition-all duration-200 shadow-md hover:shadow-lg"
           >
             {isSubscribing ? (
               <span className="flex items-center justify-center">

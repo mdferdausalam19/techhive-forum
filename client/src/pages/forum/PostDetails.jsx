@@ -88,7 +88,7 @@ export default function PostDetails() {
   };
 
   const getPostUrl = () => {
-    return `${window.location.origin}/posts/${id}`;
+    return `${window.location.origin}/post/${id}`;
   };
 
   if (isLoading || voteLoading || likeLoading) {

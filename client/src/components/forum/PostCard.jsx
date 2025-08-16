@@ -27,7 +27,7 @@ export default function PostCard({
 
   return (
     <Link to={`/post/${_id}`}>
-      <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-gray-200 overflow-hidden group">
+      <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 border border-blue-200 overflow-hidden group hover:border-blue-400">
         <div className="p-6">
           {/* Category Badge */}
           <div className="flex items-center justify-between mb-3">

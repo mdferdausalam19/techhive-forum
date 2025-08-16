@@ -285,7 +285,7 @@ export default function MyPosts() {
                                 clipRule="evenodd"
                               />
                             </svg>
-                            {post.upvotes}
+                            {post.upvotes.length}
                           </span>
                           <span className="flex items-center">
                             <svg
@@ -299,7 +299,7 @@ export default function MyPosts() {
                                 clipRule="evenodd"
                               />
                             </svg>
-                            {post.comments}
+                            {post.comments.length}
                           </span>
                         </div>
                       </td>
