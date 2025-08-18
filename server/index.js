@@ -86,6 +86,19 @@ const verifyAdminUser = async (req, res, next) => {
   next();
 };
 
+// Middleware to verify user role
+const verifyUserRole = (...allowedRoles) => {
+  return async (req, res, next) => {
+    const uid = req.user.uid;
+    const query = { uid };
+    const user = await usersCollection.findOne(query);
+    if (!user || !allowedRoles.includes(user.role)) {
+      return res.status(401).json({ message: "unauthorized access!" });
+    }
+    next();
+  };
+};
+
 async function run() {
   try {
     const database = client.db("techhive");
