@@ -124,6 +124,24 @@ async function run() {
       }
     });
 
+    // API route to sign out and clear JWT token cookie
+    app.post("/sign-out", async (req, res) => {
+      try {
+        res.clearCookie("token", {
+          ...cookieOptions,
+          maxAge: 0,
+        });
+        res.status(200).json({
+          message: "Sign out successful!",
+        });
+      } catch (err) {
+        console.error("Error signing out: ", err.message);
+        res.status(500).json({
+          message: "Failed to sign out.",
+        });
+      }
+    });
+
     // API route to save user data
     app.post("/users", async (req, res) => {
       try {
