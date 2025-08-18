@@ -2,11 +2,27 @@ const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
 const app = express();
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
 const port = process.env.PORT || 5000;
 
 // Middleware setup for CORS and JSON parsing
-app.use(cors());
+const corsOptions = {
+  origin: ["http://localhost:5173", "https://techhive.vercel.app"],
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
+app.use(cookieParser());
+
+const cookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+  maxAge: 24 * 60 * 60 * 1000, // 1 day
+};
 
 // MongoDB dependencies and client initialization
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
@@ -20,6 +36,22 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   },
 });
+
+// Middleware to verify JWT token and decode user information
+const verifyToken = (req, res, next) => {
+  const token = req.cookies?.token;
+  if (!token) {
+    return res.status(401).json({ message: "unauthorized access!" });
+  }
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).json({ message: "unauthorized access!" });
+    }
+    req.user = decoded;
+    next();
+  });
+};
 
 async function run() {
   try {

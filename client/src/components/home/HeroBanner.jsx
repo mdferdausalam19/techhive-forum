@@ -81,19 +81,29 @@ export default function HeroBanner() {
           </div>
 
           <div className="mt-12 flex flex-col sm:flex-row justify-center gap-4">
-            <button
-              disabled={user}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-8 rounded-full text-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Link to="/sign-up">Join Community</Link>
-            </button>
-
-            <Link
-              to="/membership"
-              className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-semibold py-3 px-8 rounded-full text-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-            >
-              Explore Premium
-            </Link>
+            {user ? (
+              <Link
+                to="/membership"
+                className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-semibold py-3 px-8 rounded-full text-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              >
+                Explore Premium
+              </Link>
+            ) : (
+              <>
+                <Link
+                  to="/sign-up"
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-8 rounded-full text-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Join Community
+                </Link>
+                <Link
+                  to="/membership"
+                  className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-semibold py-3 px-8 rounded-full text-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                >
+                  Explore Premium
+                </Link>
+              </>
+            )}
           </div>
 
           <div className="mt-16 grid grid-cols-1 gap-4 sm:grid-cols-3">
