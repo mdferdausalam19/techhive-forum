@@ -75,7 +75,7 @@ const verifyPremiumUser = async (req, res, next) => {
   next();
 };
 
-// Middleware to verify admin
+// Middleware to verify admin user
 const verifyAdminUser = async (req, res, next) => {
   const uid = req.user.uid;
   const query = { uid };
@@ -93,6 +93,36 @@ async function run() {
     const usersCollection = database.collection("users");
     const commentsCollection = database.collection("comments");
     const reportsCollection = database.collection("reports");
+
+    // API route to generate JWT token and set it as a cookie
+    app.post("/jwt", async (req, res) => {
+      try {
+        const user = req.body;
+        const query = { uid: user.uid };
+        const existingUser = await usersCollection.findOne(query);
+        if (!existingUser) {
+          return res.status(401).json({
+            message: "Invalid user.",
+          });
+        }
+        const token = jwt.sign(
+          { uid: existingUser.uid },
+          process.env.ACCESS_TOKEN_SECRET,
+          {
+            expiresIn: "1d",
+          }
+        );
+        res.cookie("token", token, cookieOptions);
+        res.status(200).json({
+          message: "Sign in successful!",
+        });
+      } catch (err) {
+        console.error("Error logging in: ", err.message);
+        res.status(500).json({
+          message: "Failed to sign in.",
+        });
+      }
+    });
 
     // API route to save user data
     app.post("/users", async (req, res) => {
