@@ -53,6 +53,39 @@ const verifyToken = (req, res, next) => {
   });
 };
 
+// Middleware to verify general user
+const verifyGeneralUser = async (req, res, next) => {
+  const uid = req.user.uid;
+  const query = { uid };
+  const user = await usersCollection.findOne(query);
+  if (!user || user.role !== "General") {
+    return res.status(401).json({ message: "unauthorized access!" });
+  }
+  next();
+};
+
+// Middleware to verify premium user
+const verifyPremiumUser = async (req, res, next) => {
+  const uid = req.user.uid;
+  const query = { uid };
+  const user = await usersCollection.findOne(query);
+  if (!user || user.role !== "Premium") {
+    return res.status(401).json({ message: "unauthorized access!" });
+  }
+  next();
+};
+
+// Middleware to verify admin
+const verifyAdminUser = async (req, res, next) => {
+  const uid = req.user.uid;
+  const query = { uid };
+  const user = await usersCollection.findOne(query);
+  if (!user || user.role !== "Admin") {
+    return res.status(401).json({ message: "unauthorized access!" });
+  }
+  next();
+};
+
 async function run() {
   try {
     const database = client.db("techhive");
