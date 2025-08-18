@@ -122,10 +122,18 @@ async function run() {
       }
     });
 
-    // API route to get all posts
+    // API route to get all posts and optionally search by title and filter by category
     app.get("/posts", async (req, res) => {
       try {
-        const posts = await postsCollection.find().toArray();
+        const { search, category } = req.query;
+        const query = {};
+        if (search) {
+          query.title = { $regex: search, $options: "i" };
+        }
+        if (category) {
+          query.category = category;
+        }
+        const posts = await postsCollection.find(query).toArray();
         res.status(200).json(posts);
       } catch (err) {
         console.error("Error fetching posts: ", err.message);

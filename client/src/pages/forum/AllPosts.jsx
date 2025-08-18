@@ -6,14 +6,29 @@ import useAxiosCommon from "../../hooks/useAxiosCommon";
 export default function AllPosts() {
   const axiosCommon = useAxiosCommon();
   const [posts, setPosts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [category, setCategory] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const categories = [
+    "All Categories",
+    "General Discussion",
+    "Frontend Development",
+    "Backend Development",
+    "Mobile Development",
+    "DevOps",
+    "Data Science",
+    "Career Advice",
+  ];
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
         setLoading(true);
-        const { data } = await axiosCommon.get("/posts");
+        const { data } = await axiosCommon.get(
+          `/posts?search=${searchQuery}&category=${category}`
+        );
         setPosts(data);
       } catch (err) {
         setError("Failed to fetch posts");
@@ -24,7 +39,12 @@ export default function AllPosts() {
     };
 
     fetchPosts();
-  }, [axiosCommon]);
+  }, [axiosCommon, searchQuery, category]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setSearchQuery(e.target.searchQuery.value);
+  };
 
   if (loading) {
     return <LoadingSpinner />;
@@ -55,9 +75,44 @@ export default function AllPosts() {
           <h1 className="text-4xl font-bold text-gray-900 mb-4">All Posts</h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
             Explore our comprehensive collection of technical discussions,
-            tutorials, and insights from developers around the world. Join the
-            conversation and share your knowledge with the community.
+            tutorials, and insights from developers around the world.
           </p>
+        </div>
+
+        <div className="flex flex-col md:flex-row justify-between gap-4 mb-8 bg-white p-4 rounded-lg px-6 py-5 border border-gray-200 shadow-sm">
+          <form
+            onSubmit={handleSearch}
+            className="flex-1 flex items-center gap-2 relative"
+          >
+            <input
+              name="searchQuery"
+              className="w-full border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 p-3"
+              type="text"
+              placeholder="Search posts by title..."
+            />
+            <button
+              type="submit"
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            >
+              Search
+            </button>
+          </form>
+          <div>
+            <select
+              className="w-full border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 p-3"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+            >
+              {categories.map((category) => (
+                <option
+                  key={category}
+                  value={category === "All Categories" ? "" : category}
+                >
+                  {category}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">

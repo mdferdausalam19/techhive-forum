@@ -1,21 +1,9 @@
-import { useState } from "react";
-import {
-  FaSearch,
-  FaRobot,
-  FaUsers,
-  FaComments,
-  FaCrown,
-  FaStar,
-} from "react-icons/fa";
+import { FaRobot, FaUsers, FaComments, FaCrown, FaStar } from "react-icons/fa";
+import { Link } from "react-router";
+import useAuth from "../../hooks/useAuth";
 
 export default function HeroBanner() {
-  const [searchQuery, setSearchQuery] = useState("");
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    console.log("Search query:", searchQuery);
-    setSearchQuery("");
-  };
+  const { user } = useAuth();
 
   return (
     <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
@@ -43,50 +31,6 @@ export default function HeroBanner() {
             . Engage in meaningful conversations, get AI-powered content
             suggestions, and connect with tech professionals worldwide.
           </p>
-
-          <div className="mt-10 max-w-2xl mx-auto">
-            <form onSubmit={handleSearch} className="relative">
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <FaSearch className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search discussions, AI insights, or tech topics..."
-                  className="block w-full pl-10 pr-24 py-4 border border-gray-300 rounded-full text-lg placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-lg transition-all duration-200"
-                />
-                <div className="absolute inset-y-0 right-0 flex items-center">
-                  <button
-                    type="submit"
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-2 px-6 rounded-full mr-2 transition-all duration-200 shadow-md"
-                  >
-                    Search
-                  </button>
-                </div>
-              </div>
-            </form>
-
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-              <span className="text-sm text-gray-500">Popular Topics:</span>
-              {[
-                "AI & ML",
-                "Web Development",
-                "Mobile Apps",
-                "Cloud Computing",
-                "DevOps",
-                "Blockchain",
-              ].map((tag) => (
-                <button
-                  key={tag}
-                  className="text-sm bg-white/60 hover:bg-white/80 text-gray-700 px-3 py-1 rounded-full border border-blue-200 transition-all duration-200 hover:shadow-sm"
-                >
-                  {tag}
-                </button>
-              ))}
-            </div>
-          </div>
 
           <div className="mt-16 grid grid-cols-2 gap-8 sm:grid-cols-4">
             <div className="text-center group">
@@ -137,12 +81,19 @@ export default function HeroBanner() {
           </div>
 
           <div className="mt-12 flex flex-col sm:flex-row justify-center gap-4">
-            <button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-8 rounded-full text-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-              Join Community
+            <button
+              disabled={user}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-8 rounded-full text-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Link to="/sign-up">Join Community</Link>
             </button>
-            <button className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-semibold py-3 px-8 rounded-full text-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+
+            <Link
+              to="/membership"
+              className="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-semibold py-3 px-8 rounded-full text-lg transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            >
               Explore Premium
-            </button>
+            </Link>
           </div>
 
           <div className="mt-16 grid grid-cols-1 gap-4 sm:grid-cols-3">
