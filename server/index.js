@@ -8,7 +8,7 @@ const port = process.env.PORT || 5000;
 
 // Middleware setup for CORS and JSON parsing
 const corsOptions = {
-  origin: ["http://localhost:5173", "https://techhive.vercel.app"],
+  origin: ["http://localhost:5173", "https://techhive-forum.vercel.app"],
   credentials: true,
   optionsSuccessStatus: 200,
 };
