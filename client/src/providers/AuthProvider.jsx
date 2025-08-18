@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 import {
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
@@ -50,14 +51,43 @@ const AuthProvider = ({ children }) => {
   };
 
   // sign out the user
-  const signOutUser = () => {
+  const signOutUser = async () => {
     setUser(null);
     setLoading(true);
+    await axios.post(`${import.meta.env.VITE_API_URL}/sign-out`, {
+      withCredentials: true,
+    });
     return signOut(auth);
+  };
+
+  // get token from server
+  const getToken = async (uid) => {
+    const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/jwt`, {
+      uid,
+      withCredentials: true,
+    });
+    return data;
+  };
+
+  // save user in database
+  const saveUser = async (user) => {
+    const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/users`, {
+      uid: user?.uid,
+      email: user?.email,
+      name: user?.displayName,
+      avatar: user?.photoURL || "https://i.ibb.co/9H2PJ7h2/d43801412989.jpg",
+      role: "General",
+      badge: "Bronze",
+    });
+    return data;
   };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        getToken(currentUser?.uid);
+        saveUser(currentUser);
+      }
       setUser(currentUser || null);
       setLoading(false);
     });
