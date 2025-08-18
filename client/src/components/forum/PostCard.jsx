@@ -37,12 +37,14 @@ export default function PostCard({
           </div>
 
           {/* Title */}
-          <h2 className="block text-lg font-bold text-gray-900 hover:text-blue-600 transition-colors duration-200 mb-2 group-hover:text-blue-600">
+          <h2 className="block text-lg font-bold text-gray-900 hover:text-blue-600 transition-colors duration-200 mb-2 group-hover:text-blue-600 overflow-hidden overflow-ellipsis line-clamp-2">
             {title}
           </h2>
 
           {/* Excerpt */}
-          <p className="text-gray-600 text-sm mb-4 line-clamp-2">{excerpt}</p>
+          <p className="text-gray-600 text-sm mb-4 overflow-hidden overflow-ellipsis line-clamp-2">
+            {excerpt}
+          </p>
 
           {/* Tags */}
           {tags.length > 0 && (

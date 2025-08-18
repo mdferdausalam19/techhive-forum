@@ -1,6 +1,5 @@
 import { useParams } from "react-router";
 import CommentSection from "../../components/comment/CommentSection";
-import useAxiosCommon from "../../hooks/useAxiosCommon";
 import toast from "react-hot-toast";
 import useAuth from "../../hooks/useAuth";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -8,11 +7,12 @@ import LoadingSpinner from "../../components/shared/LoadingSpinner";
 import { useState } from "react";
 import { FaHeart } from "react-icons/fa";
 import ShareModal from "../../components/forum/ShareModal";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 export default function PostDetails() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const axiosCommon = useAxiosCommon();
+  const axiosSecure = useAxiosSecure();
   const { id } = useParams();
   const [voteStatus, setVoteStatus] = useState({
     upvoted: false,
@@ -28,7 +28,7 @@ export default function PostDetails() {
   } = useQuery({
     queryKey: ["post", id],
     queryFn: async () => {
-      const { data } = await axiosCommon.get(`/posts/${id}`);
+      const { data } = await axiosSecure.get(`/posts/${id}`);
       setVoteStatus({
         upvoted: data.upvotes.includes(user?.uid),
         downvoted: data.downvotes.includes(user?.uid),
@@ -40,7 +40,7 @@ export default function PostDetails() {
 
   const { mutateAsync: voteMutateAsync, isLoading: voteLoading } = useMutation({
     mutationFn: async (voteInfo) =>
-      await axiosCommon.patch(`/posts/${post._id}/vote`, voteInfo),
+      await axiosSecure.patch(`/posts/${post._id}/vote`, voteInfo),
     onSuccess: ({ data }) => {
       toast.success(data.message);
       queryClient.invalidateQueries({ queryKey: ["post", id] });
@@ -52,7 +52,7 @@ export default function PostDetails() {
 
   const { mutateAsync: likeMutateAsync, isLoading: likeLoading } = useMutation({
     mutationFn: async (likeInfo) =>
-      await axiosCommon.patch(`/posts/${post._id}/like`, likeInfo),
+      await axiosSecure.patch(`/posts/${post._id}/like`, likeInfo),
     onSuccess: ({ data }) => {
       toast.success(data.message);
       queryClient.invalidateQueries({ queryKey: ["post", id] });

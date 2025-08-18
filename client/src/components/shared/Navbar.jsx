@@ -258,13 +258,13 @@ export default function Navbar() {
               <>
                 <Link
                   to="/sign-in"
-                  className="text-gray-700 hover:text-blue-600 px-4 py-2 text-sm font-medium transition-all duration-300 hover:bg-blue-50 rounded-lg"
+                  className="text-gray-700 hover:text-blue-600 px-6 py-2.5 text-sm font-medium transition-all duration-300 hover:bg-blue-50 rounded-lg shadow-md hover:shadow-lg transform hover:scale-105 border border-blue-400"
                 >
                   Sign In
                 </Link>
                 <Link
                   to="/sign-up"
-                  className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+                  className="bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 px-6 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
                 >
                   Sign Up
                 </Link>

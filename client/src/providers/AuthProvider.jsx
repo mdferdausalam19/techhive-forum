@@ -54,18 +54,25 @@ const AuthProvider = ({ children }) => {
   const signOutUser = async () => {
     setUser(null);
     setLoading(true);
-    await axios.post(`${import.meta.env.VITE_API_URL}/sign-out`, {
-      withCredentials: true,
-    });
+    await axios.post(
+      `${import.meta.env.VITE_API_URL}/sign-out`,
+      {},
+      {
+        withCredentials: true,
+      }
+    );
     return signOut(auth);
   };
 
   // get token from server
   const getToken = async (uid) => {
-    const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/jwt`, {
-      uid,
-      withCredentials: true,
-    });
+    const { data } = await axios.post(
+      `${import.meta.env.VITE_API_URL}/jwt`,
+      { uid },
+      {
+        withCredentials: true,
+      }
+    );
     return data;
   };
 

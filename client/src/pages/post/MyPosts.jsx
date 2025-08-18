@@ -4,10 +4,10 @@ import toast from "react-hot-toast";
 import EditPost from "../../components/post/EditPost";
 import DeletePostModal from "../../components/post/DeletePostModal";
 import useAuth from "../../hooks/useAuth";
-import useAxiosCommon from "../../hooks/useAxiosCommon";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 export default function MyPosts() {
-  const axiosCommon = useAxiosCommon();
+  const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
   const [posts, setPosts] = useState([]);
   const [editingPost, setEditingPost] = useState(null);
@@ -21,7 +21,7 @@ export default function MyPosts() {
     async function fetchPosts() {
       try {
         setLoading(true);
-        const { data } = await axiosCommon.get(`/posts/user/${user?.uid}`);
+        const { data } = await axiosSecure.get(`/posts/user/${user?.uid}`);
         setPosts(data);
       } catch (error) {
         console.log(error);
@@ -30,7 +30,7 @@ export default function MyPosts() {
       }
     }
     fetchPosts();
-  }, [user, axiosCommon]);
+  }, [user, axiosSecure]);
 
   const handleEditPost = (post) => {
     setEditingPost(post);
@@ -38,7 +38,7 @@ export default function MyPosts() {
   };
 
   const handleSavePost = async (updatedPost) => {
-    await axiosCommon.put(`/posts/${updatedPost._id}`, updatedPost);
+    await axiosSecure.put(`/posts/${updatedPost._id}`, updatedPost);
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
         post._id === updatedPost._id ? updatedPost : post
@@ -56,7 +56,7 @@ export default function MyPosts() {
 
   const confirmDeletePost = async () => {
     setIsDeleting(true);
-    await axiosCommon.delete(`/posts/${deletingPost._id}`);
+    await axiosSecure.delete(`/posts/${deletingPost._id}`);
     setPosts((prevPosts) =>
       prevPosts.filter((p) => p._id !== deletingPost._id)
     );

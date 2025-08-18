@@ -4,10 +4,10 @@ import { Navigate, useNavigate } from "react-router";
 import toast from "react-hot-toast";
 import VisibilitySelector from "../../components/post/VisibilitySelector";
 import useAuth from "../../hooks/useAuth";
-import useAxiosCommon from "../../hooks/useAxiosCommon";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 export default function CreatePost() {
-  const axiosCommon = useAxiosCommon();
+  const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -79,7 +79,7 @@ export default function CreatePost() {
         category: data.category,
       };
 
-      await axiosCommon.post("/posts", newPost);
+      await axiosSecure.post("/posts", newPost);
 
       toast.success("Post created successfully!");
       reset();

@@ -5,7 +5,7 @@ import toast from "react-hot-toast";
 import AddCommentModal from "./AddCommentModal";
 import ReplyModal from "./ReplyModal";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import useAxiosCommon from "../../hooks/useAxiosCommon";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 import useAuth from "../../hooks/useAuth";
 import LoadingSpinner from "../shared/LoadingSpinner";
 
@@ -15,13 +15,13 @@ export default function CommentSection({ post }) {
   const [showAddModal, setShowAddModal] = useState(false);
   const [newComment, setNewComment] = useState("");
   const queryClient = useQueryClient();
-  const axiosCommon = useAxiosCommon();
+  const axiosSecure = useAxiosSecure();
   const { user } = useAuth();
 
   const { data: comments = [], isLoading: commentsLoading } = useQuery({
     queryKey: ["comments", post._id],
     queryFn: async () => {
-      const { data } = await axiosCommon.get(`/posts/${post._id}/comments`);
+      const { data } = await axiosSecure.get(`/posts/${post._id}/comments`);
       return data;
     },
   });
@@ -29,7 +29,7 @@ export default function CommentSection({ post }) {
   const { mutateAsync: commentMutateAsync, isLoading: commentAdding } =
     useMutation({
       mutationFn: async (commentInfo) =>
-        await axiosCommon.post(`/posts/${post._id}/comment`, commentInfo),
+        await axiosSecure.post(`/posts/${post._id}/comment`, commentInfo),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: ["comments", post._id] });
         queryClient.invalidateQueries({ queryKey: ["post", post._id] });
@@ -112,7 +112,7 @@ export default function CommentSection({ post }) {
   const { mutateAsync: reportMutateAsync, isLoading: reportLoading } =
     useMutation({
       mutationFn: async (reportInfo) =>
-        await axiosCommon.post(
+        await axiosSecure.post(
           `/comments/${reportInfo.commentId}/report`,
           reportInfo
         ),

@@ -3,11 +3,11 @@ import Badge from "../../components/profile/Badge";
 import useAuth from "../../hooks/useAuth";
 import toast from "react-hot-toast";
 import LoadingSpinner from "../../components/shared/LoadingSpinner";
-import useAxiosCommon from "../../hooks/useAxiosCommon";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 export default function UserProfile() {
   const { user, updateUserProfile, loading, setLoading } = useAuth();
-  const axiosCommon = useAxiosCommon();
+  const axiosSecure = useAxiosSecure();
   const isPremium = user?.premium;
   const {
     register,
@@ -21,7 +21,7 @@ export default function UserProfile() {
     try {
       setLoading(true);
       await updateUserProfile(displayName, photoURL);
-      await axiosCommon.put(`/users/${user?.email}`, {
+      await axiosSecure.put(`/users/${user?.email}`, {
         name: displayName,
         avatar: photoURL || "https://i.ibb.co/9H2PJ7h2/d43801412989.jpg",
       });
