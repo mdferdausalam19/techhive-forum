@@ -1,15 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import PostList from "../../components/forum/PostList";
-import LoadingSpinner from "../../components/shared/LoadingSpinner";
 import useAxiosCommon from "../../hooks/useAxiosCommon";
+import { useQuery } from "@tanstack/react-query";
+import LoadingSpinner from "../../components/shared/LoadingSpinner";
 
 export default function AllPosts() {
   const axiosCommon = useAxiosCommon();
-  const [posts, setPosts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   const categories = [
     "All Categories",
@@ -22,33 +20,24 @@ export default function AllPosts() {
     "Career Advice",
   ];
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        setLoading(true);
-        const { data } = await axiosCommon.get(
-          `/posts?search=${searchQuery}&category=${category}`
-        );
-        setPosts(data);
-      } catch (err) {
-        setError("Failed to fetch posts");
-        console.error("Error fetching posts:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPosts();
-  }, [axiosCommon, searchQuery, category]);
+  const {
+    data: posts = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["posts", searchQuery, category],
+    queryFn: async () => {
+      const { data } = await axiosCommon.get(
+        `/posts?search=${searchQuery}&category=${category}`
+      );
+      return data;
+    },
+  });
 
   const handleSearch = (e) => {
     e.preventDefault();
     setSearchQuery(e.target.searchQuery.value);
   };
-
-  if (loading) {
-    return <LoadingSpinner />;
-  }
 
   if (error) {
     return (
@@ -115,9 +104,13 @@ export default function AllPosts() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <PostList posts={posts} />
-        </div>
+        {isLoading ? (
+          <LoadingSpinner />
+        ) : (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <PostList posts={posts} />
+          </div>
+        )}
       </div>
     </div>
   );

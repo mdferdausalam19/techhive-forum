@@ -1,34 +1,30 @@
 import { Link } from "react-router";
 import PostList from "../forum/PostList";
-import { useEffect, useState } from "react";
 import LoadingSpinner from "../shared/LoadingSpinner";
 import useAxiosCommon from "../../hooks/useAxiosCommon";
+import { useQuery } from "@tanstack/react-query";
 
 export default function LatestPosts() {
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const axiosCommon = useAxiosCommon();
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        setLoading(true);
-        const { data } = await axiosCommon.get("/posts");
-        setPosts(data);
-      } catch (err) {
-        setError("Failed to fetch posts");
-        console.error("Error fetching posts:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const {
+    data: posts = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["posts"],
+    queryFn: async () => {
+      const { data } = await axiosCommon.get("/posts");
+      return data;
+    },
+  });
 
-    fetchPosts();
-  }, [axiosCommon]);
-
-  if (loading) {
-    return <LoadingSpinner />;
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-[50vh]">
+        <div className="h-20 w-20 rounded-full border border-blue-500 animate-spin border-t-0"></div>
+      </div>
+    );
   }
 
   if (error) {
