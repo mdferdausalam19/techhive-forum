@@ -154,6 +154,21 @@ async function run() {
       }
     );
 
+    // API route to get user by uid
+    app.get("/users/:uid", verifyToken, async (req, res) => {
+      try {
+        const { uid } = req.params;
+        const query = { uid };
+        const user = await usersCollection.findOne(query);
+        res.status(200).json(user);
+      } catch (err) {
+        console.error("Error fetching user: ", err.message);
+        res.status(500).json({
+          message: "Failed to fetch user.",
+        });
+      }
+    });
+
     // API route to save user data
     app.post("/users", async (req, res) => {
       try {
