@@ -3,6 +3,7 @@ import HeroBanner from "../../components/home/HeroBanner";
 import Newsletter from "../../components/home/Newsletter";
 import FAQ from "../../components/home/FAQ";
 import Testimonials from "../../components/home/Testimonials";
+import Announcement from "../../components/home/Announcement";
 
 export default function Home() {
   return (
@@ -13,6 +14,7 @@ export default function Home() {
           <LatestPosts />
           <Newsletter />
           <Testimonials />
+          <Announcement />
           <FAQ />
         </div>
       </div>
