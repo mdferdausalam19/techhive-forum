@@ -183,25 +183,25 @@ async function run() {
       }
     });
 
-    // API route to update user by email and reflect changes in their posts
+    // API route to update user by email and reflect changes in their posts, comments and replies
     app.put(
-      "/users/:email",
+      "/users/:uid",
       verifyToken,
       verifyUserRole("General", "Premium", "Admin"),
       async (req, res) => {
         try {
-          const { email } = req.params;
+          const { uid } = req.params;
           const updateData = req.body;
 
           // Find the existing user
-          const existingUser = await usersCollection.findOne({ email });
+          const existingUser = await usersCollection.findOne({ uid });
           if (!existingUser) {
             return res.status(404).json({ message: "User not found." });
           }
 
           // Update user in users collection
           const userUpdateResult = await usersCollection.updateOne(
-            { email },
+            { uid },
             { $set: updateData }
           );
 
@@ -220,9 +220,29 @@ async function run() {
             { $set: { author: updatedAuthor } }
           );
 
+          const updatedCommentsAuthor = {
+            id: existingUser.uid,
+            name: updateData.name ?? existingUser.name,
+            avatar: updateData.avatar ?? existingUser.avatar,
+          };
+
+          // Update all comments created by this user using Firebase UID
+          const commentsUpdateResult = await commentsCollection.updateMany(
+            { "author.id": existingUser.uid },
+            { $set: { author: updatedCommentsAuthor } }
+          );
+
+          // Update all comments replies created by this user using Firebase UID
+          const repliesUpdateResult = await commentsCollection.updateMany(
+            { "reply_to_author.id": existingUser.uid },
+            { $set: { reply_to_author: updatedCommentsAuthor } }
+          );
+
           res.status(200).json({
             message: "User and posts updated successfully!",
             userUpdated: userUpdateResult.modifiedCount,
+            commentsUpdated: commentsUpdateResult.modifiedCount,
+            repliesUpdated: repliesUpdateResult.modifiedCount,
             postsUpdated: postsUpdateResult.modifiedCount,
           });
         } catch (error) {

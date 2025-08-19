@@ -21,7 +21,7 @@ export default function UserProfile() {
     try {
       setLoading(true);
       await updateUserProfile(displayName, photoURL);
-      await axiosSecure.put(`/users/${user?.email}`, {
+      await axiosSecure.put(`/users/${user?.uid}`, {
         name: displayName,
         avatar: photoURL || "https://i.ibb.co/9H2PJ7h2/d43801412989.jpg",
       });

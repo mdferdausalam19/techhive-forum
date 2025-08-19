@@ -53,7 +53,7 @@ export default function CommentSection({ post }) {
       },
       comment: newComment,
       parent_id: null,
-      reply_to: null,
+      reply_to_author: null,
       timestamp: Date.now(),
     };
     try {
@@ -94,8 +94,12 @@ export default function CommentSection({ post }) {
         avatar: user?.photoURL,
       },
       comment: replyText,
-      parent_id: replyingToComment.id,
-      reply_to: replyingToComment.author?.name,
+      parent_id: replyingToComment._id,
+      reply_to_author: {
+        id: replyingToComment?.author?.id,
+        name: replyingToComment?.author?.name,
+        avatar: replyingToComment?.author?.avatar,
+      },
       timestamp: Date.now(),
     };
     try {

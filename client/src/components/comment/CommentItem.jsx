@@ -6,7 +6,7 @@ export default function CommentItem({ comment, onReport, onReply }) {
   return (
     <div
       className={`relative rounded-lg p-5 mb-2 shadow-sm border border-blue-100 hover:shadow-lg transition-all duration-200 ${
-        comment.reply_to
+        comment.reply_to_author
           ? "bg-blue-50 border-l-4 border-blue-300"
           : "bg-white border-l-4 border-blue-100"
       }`}
@@ -29,9 +29,9 @@ export default function CommentItem({ comment, onReport, onReply }) {
           </span>
         </div>
       </div>
-      {comment.reply_to && (
+      {comment.reply_to_author && (
         <div className="text-xs text-blue-600 mb-1">
-          Reply to {comment.reply_to}
+          Reply to {comment.reply_to_author.name}
         </div>
       )}
       <p className="text-gray-700 mb-2">{comment.comment}</p>
