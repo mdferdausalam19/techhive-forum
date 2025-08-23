@@ -1,6 +1,5 @@
 import { Link } from "react-router";
 import PostList from "../forum/PostList";
-import LoadingSpinner from "../shared/LoadingSpinner";
 import useAxiosCommon from "../../hooks/useAxiosCommon";
 import { useQuery } from "@tanstack/react-query";
 
@@ -22,7 +21,7 @@ export default function LatestPosts() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-[50vh]">
-        <div className="h-20 w-20 rounded-full border border-blue-500 animate-spin border-t-0"></div>
+        <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500 border-t-2"></div>
       </div>
     );
   }

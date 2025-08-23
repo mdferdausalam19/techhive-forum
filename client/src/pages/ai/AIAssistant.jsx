@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState} from "react";
 import AIMessage from "../../components/ai/AIMessage";
 import AIPromptSuggestions from "../../components/ai/AIPromptSuggestions";
 import PostGenerator from "../../components/ai/PostGenerator";
@@ -18,15 +18,6 @@ export default function AIAssistant() {
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [generatedPost, setGeneratedPost] = useState(null);
-  const messagesEndRef = useRef(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, isTyping]);
 
   const handleSendMessage = () => {
     if (!inputValue.trim()) return;
@@ -156,7 +147,6 @@ export default function AIAssistant() {
                     </span>
                   </div>
                 )}
-                <div ref={messagesEndRef} />
               </div>
 
               {/* Input Section */}
