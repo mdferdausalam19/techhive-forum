@@ -1,25 +1,41 @@
 import React, { useState } from "react";
 import MembershipModal from "../../components/membership/MembershipModal";
 import PricingCard from "../../components/membership/PricingCard";
+import useAxiosCommon from "../../hooks/useAxiosCommon";
+import useAuth from "../../hooks/useAuth";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router";
 
 export default function Membership() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { user } = useAuth();
+  const axiosCommon = useAxiosCommon();
+  const navigate = useNavigate();
 
   const handleUpgrade = () => {
     setIsModalOpen(true);
   };
 
-  const handleConfirmPayment = async () => {
+  const handleConfirmPayment = async (formData) => {
     setIsLoading(true);
     try {
-      console.log("Redirecting to payment...");
-      setTimeout(() => {
-        setIsLoading(false);
-        setIsModalOpen(false);
-      }, 1000);
+      const paymentInfo = {
+        uid: user.uid,
+        cardNumber: formData.cardNumber,
+        cardName: formData.cardName,
+        expiryDate: formData.expiryDate,
+        cvv: formData.cvv,
+      };
+      await axiosCommon.post("/payments", paymentInfo);
+      await axiosCommon.patch("/upgrade", { uid: user.uid });
+      toast.success("Payment successful!");
+      setIsLoading(false);
+      setIsModalOpen(false);
+      navigate("/posts");
     } catch (error) {
       console.error("Payment failed:", error);
+      toast.error("Payment failed!");
       setIsLoading(false);
     }
   };

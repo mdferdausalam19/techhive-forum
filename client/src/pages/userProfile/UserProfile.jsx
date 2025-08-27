@@ -4,11 +4,13 @@ import useAuth from "../../hooks/useAuth";
 import toast from "react-hot-toast";
 import LoadingSpinner from "../../components/shared/LoadingSpinner";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
+import useRole from "../../hooks/useRole";
 
 export default function UserProfile() {
   const { user, updateUserProfile, loading, setLoading } = useAuth();
   const axiosSecure = useAxiosSecure();
-  const isPremium = user?.premium;
+  const { role } = useRole();
+  const isPremium = role === "Premium";
   const {
     register,
     handleSubmit,

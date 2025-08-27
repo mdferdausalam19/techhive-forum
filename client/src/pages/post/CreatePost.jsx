@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import VisibilitySelector from "../../components/post/VisibilitySelector";
 import useAuth from "../../hooks/useAuth";
 import useAxiosSecure from "../../hooks/useAxiosSecure";
+import useRole from "../../hooks/useRole";
 
 export default function CreatePost() {
   const axiosSecure = useAxiosSecure();
@@ -12,8 +13,9 @@ export default function CreatePost() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [showPremiumGate, setShowPremiumGate] = useState(false);
+  const { role } = useRole();
 
-  const isPremium = user?.role === "Premium";
+  const isPremium = role === "Premium";
 
   const {
     register,
