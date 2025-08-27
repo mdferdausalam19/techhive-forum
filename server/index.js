@@ -5,6 +5,9 @@ const app = express();
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const port = process.env.PORT || 5000;
+const { GoogleGenerativeAI } = require("@google/generative-ai");
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 // Middleware setup for CORS and JSON parsing
 const corsOptions = {
@@ -590,6 +593,57 @@ async function run() {
         }
       }
     );
+
+    // API route for AI assistant
+    app.post("/ai/assist", async (req, res) => {
+      try {
+        const { message } = req.body;
+
+        if (!message) {
+          return res.status(400).json({ error: "Message is required" });
+        }
+
+        // System prompt for clean, conversational responses
+        const prompt = `You are a helpful AI assistant. Respond to the following message in a clear, friendly manner. Do not use any markdown formatting, code blocks, or special characters like **, \`, or #. Just provide a plain text response.`;
+
+        // Generate content using the model
+        const chat = model.startChat({
+          history: [
+            {
+              role: "user",
+              parts: [{ text: prompt }],
+            },
+            {
+              role: "model",
+              parts: [
+                { text: "I'm ready to help! What would you like to know?" },
+              ],
+            },
+          ],
+        });
+
+        const result = await chat.sendMessage(message);
+        const response = await result.response;
+        let text = response.text();
+
+        // Clean up the response
+        text = text
+          .replace(/[\*_`#]/g, "") // Remove markdown characters
+          .replace(/\n\s*\n/g, "\n") // Remove extra newlines
+          .trim();
+
+        return res.json({
+          type: "text",
+          content: text,
+        });
+      } catch (error) {
+        console.error("AI API Error:", error);
+        return res.status(500).json({
+          error: "Failed to process your request",
+          details: error.message,
+        });
+      }
+    });
 
     console.log("Connected to MongoDB successfully!");
   } catch (err) {
