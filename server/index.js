@@ -625,6 +625,56 @@ async function run() {
       }
     });
 
+    // API route to upgrade user role and badge
+    app.patch("/upgrade", async (req, res) => {
+      try {
+        const { uid } = req.body;
+
+        const existingUser = await usersCollection.findOne({ uid });
+
+        if (!existingUser) {
+          return res.status(404).json({
+            message: "User not found.",
+          });
+        }
+
+        // Update the user's role and badge
+        const updateData = {
+          role: "Premium",
+          badge: "Gold",
+        };
+
+        // Update user document
+        const userResult = await usersCollection.updateOne(
+          { uid },
+          { $set: updateData }
+        );
+
+        // Update all posts where this user is the author
+        const postsResult = await postsCollection.updateMany(
+          { "author.id": uid },
+          {
+            $set: {
+              "author.role": "Premium",
+              "author.badge": "Gold",
+            },
+          }
+        );
+
+        res.status(200).json({
+          message: "User role upgraded successfully!",
+          user: userResult.modifiedCount,
+          posts: postsResult.modifiedCount,
+        });
+      } catch (err) {
+        console.error("Error upgrading user role: ", err.message);
+        res.status(500).json({
+          message: "Failed to upgrade user role.",
+          error: err.message,
+        });
+      }
+    });
+
     // API route for AI assistant
     app.post("/ai/assist", async (req, res) => {
       try {
