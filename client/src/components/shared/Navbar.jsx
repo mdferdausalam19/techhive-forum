@@ -5,14 +5,15 @@ import toast from "react-hot-toast";
 import {
   FaRobot,
   FaUser,
-  FaCog,
   FaSignOutAlt,
   FaPlus,
   FaFileAlt,
 } from "react-icons/fa";
+import useRole from "../../hooks/useRole";
 
 export default function Navbar() {
   const { user, signOutUser, loading } = useAuth();
+  const { role } = useRole();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
@@ -145,13 +146,15 @@ export default function Navbar() {
               Membership
               <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-blue-500 group-hover:w-full group-hover:left-0 transition-all duration-300"></span>
             </Link>
-            <Link
-              to="/ai-assistant"
-              className="text-gray-700 hover:text-blue-600 font-medium transition-all duration-300 hover:bg-blue-50 px-4 py-2 rounded-lg relative group"
-            >
-              AI Assistant
-              <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-blue-500 group-hover:w-full group-hover:left-0 transition-all duration-300"></span>
-            </Link>
+            {role === "Premium" && (
+              <Link
+                to="/ai-assistant"
+                className="text-gray-700 hover:text-blue-600 font-medium transition-all duration-300 hover:bg-blue-50 px-4 py-2 rounded-lg relative group"
+              >
+                AI Assistant
+                <span className="absolute bottom-0 left-1/2 w-0 h-0.5 bg-blue-500 group-hover:w-full group-hover:left-0 transition-all duration-300"></span>
+              </Link>
+            )}
           </div>
 
           {/* Desktop User Section */}
@@ -304,13 +307,15 @@ export default function Navbar() {
             >
               Membership
             </Link>
-            <Link
-              to="/ai-assistant"
-              className="block text-gray-700 hover:text-blue-600 font-medium transition-all duration-300 hover:bg-blue-50 px-4 py-3 rounded-lg transform hover:translate-x-2"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              AI Assistant
-            </Link>
+            {role === "Premium" && (
+              <Link
+                to="/ai-assistant"
+                className="block text-gray-700 hover:text-blue-600 font-medium transition-all duration-300 hover:bg-blue-50 px-4 py-3 rounded-lg transform hover:translate-x-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                AI Assistant
+              </Link>
+            )}
 
             {/* Mobile User Section */}
             {loading ? (

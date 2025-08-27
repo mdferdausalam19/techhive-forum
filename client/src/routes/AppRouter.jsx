@@ -12,6 +12,7 @@ import Membership from "../pages/membership/Membership";
 import AIAssistant from "../pages/ai/AIAssistant";
 import CreatePost from "../pages/post/CreatePost";
 import MyPosts from "../pages/post/MyPosts";
+import PremiumRoute from "./PremiumRoute";
 
 export const router = createBrowserRouter([
   {
@@ -55,7 +56,9 @@ export const router = createBrowserRouter([
         path: "/ai-assistant",
         element: (
           <PrivateRoute>
-            <AIAssistant />
+            <PremiumRoute>
+              <AIAssistant />
+            </PremiumRoute>
           </PrivateRoute>
         ),
       },

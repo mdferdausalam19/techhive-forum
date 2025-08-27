@@ -596,135 +596,155 @@ async function run() {
     );
 
     // API route to add payment
-    app.post("/payments", async (req, res) => {
-      try {
-        const paymentInfo = req.body;
-        const result = await paymentsCollection.insertOne(paymentInfo);
-        res.status(200).json({
-          message: "Payment added successfully!",
-          payment: result.insertedId,
-        });
-      } catch (err) {
-        console.error("Error adding payment: ", err.message);
-        res.status(500).json({
-          message: "Failed to add payment.",
-        });
-      }
-    });
-
-    // API route to get payments
-    app.get("/payments", async (req, res) => {
-      try {
-        const payments = await paymentsCollection.find().toArray();
-        res.status(200).json(payments);
-      } catch (err) {
-        console.error("Error fetching payments: ", err.message);
-        res.status(500).json({
-          message: "Failed to fetch payments.",
-        });
-      }
-    });
-
-    // API route to upgrade user role and badge
-    app.patch("/upgrade", async (req, res) => {
-      try {
-        const { uid } = req.body;
-
-        const existingUser = await usersCollection.findOne({ uid });
-
-        if (!existingUser) {
-          return res.status(404).json({
-            message: "User not found.",
+    app.post(
+      "/payments",
+      verifyToken,
+      verifyUserRole("General"),
+      async (req, res) => {
+        try {
+          const paymentInfo = req.body;
+          const result = await paymentsCollection.insertOne(paymentInfo);
+          res.status(200).json({
+            message: "Payment added successfully!",
+            payment: result.insertedId,
+          });
+        } catch (err) {
+          console.error("Error adding payment: ", err.message);
+          res.status(500).json({
+            message: "Failed to add payment.",
           });
         }
-
-        // Update the user's role and badge
-        const updateData = {
-          role: "Premium",
-          badge: "Gold",
-        };
-
-        // Update user document
-        const userResult = await usersCollection.updateOne(
-          { uid },
-          { $set: updateData }
-        );
-
-        // Update all posts where this user is the author
-        const postsResult = await postsCollection.updateMany(
-          { "author.id": uid },
-          {
-            $set: {
-              "author.role": "Premium",
-              "author.badge": "Gold",
-            },
-          }
-        );
-
-        res.status(200).json({
-          message: "User role upgraded successfully!",
-          user: userResult.modifiedCount,
-          posts: postsResult.modifiedCount,
-        });
-      } catch (err) {
-        console.error("Error upgrading user role: ", err.message);
-        res.status(500).json({
-          message: "Failed to upgrade user role.",
-          error: err.message,
-        });
       }
-    });
+    );
+
+    // API route to get payments
+    app.get(
+      "/payments",
+      verifyToken,
+      verifyUserRole("Admin"),
+      async (req, res) => {
+        try {
+          const payments = await paymentsCollection.find().toArray();
+          res.status(200).json(payments);
+        } catch (err) {
+          console.error("Error fetching payments: ", err.message);
+          res.status(500).json({
+            message: "Failed to fetch payments.",
+          });
+        }
+      }
+    );
+
+    // API route to upgrade user role and badge
+    app.patch(
+      "/upgrade",
+      verifyToken,
+      verifyUserRole("General"),
+      async (req, res) => {
+        try {
+          const { uid } = req.body;
+
+          const existingUser = await usersCollection.findOne({ uid });
+
+          if (!existingUser) {
+            return res.status(404).json({
+              message: "User not found.",
+            });
+          }
+
+          // Update the user's role and badge
+          const updateData = {
+            role: "Premium",
+            badge: "Gold",
+          };
+
+          // Update user document
+          const userResult = await usersCollection.updateOne(
+            { uid },
+            { $set: updateData }
+          );
+
+          // Update all posts where this user is the author
+          const postsResult = await postsCollection.updateMany(
+            { "author.id": uid },
+            {
+              $set: {
+                "author.role": "Premium",
+                "author.badge": "Gold",
+              },
+            }
+          );
+
+          res.status(200).json({
+            message: "User role upgraded successfully!",
+            user: userResult.modifiedCount,
+            posts: postsResult.modifiedCount,
+          });
+        } catch (err) {
+          console.error("Error upgrading user role: ", err.message);
+          res.status(500).json({
+            message: "Failed to upgrade user role.",
+            error: err.message,
+          });
+        }
+      }
+    );
 
     // API route for AI assistant
-    app.post("/ai/assist", async (req, res) => {
-      try {
-        const { message } = req.body;
+    app.post(
+      "/ai/assist",
+      verifyToken,
+      verifyUserRole("Premium"),
+      async (req, res) => {
+        try {
+          const { message } = req.body;
 
-        if (!message) {
-          return res.status(400).json({ error: "Message is required" });
+          if (!message) {
+            return res.status(400).json({ error: "Message is required" });
+          }
+
+          // System prompt for clean, conversational responses
+          const prompt = `You are a helpful AI assistant. Respond to the following message in a clear, friendly manner. Do not use any markdown formatting, code blocks, or special characters like **, \`, or #. Just provide a plain text response.`;
+
+          // Generate content using the model
+          const chat = model.startChat({
+            history: [
+              {
+                role: "user",
+                parts: [{ text: prompt }],
+              },
+              {
+                role: "model",
+                parts: [
+                  { text: "I'm ready to help! What would you like to know?" },
+                ],
+              },
+            ],
+          });
+
+          const result = await chat.sendMessage(message);
+          const response = await result.response;
+          let text = response.text();
+
+          // Clean up the response
+          text = text
+            .replace(/[\*_`#]/g, "") // Remove markdown characters
+            .replace(/\n\s*\n/g, "\n") // Remove extra newlines
+            .trim();
+
+          return res.json({
+            type: "text",
+            content: text,
+          });
+        } catch (error) {
+          console.error("AI API Error:", error);
+          return res.status(500).json({
+            error: "Failed to process your request",
+            details: error.message,
+          });
         }
-
-        // System prompt for clean, conversational responses
-        const prompt = `You are a helpful AI assistant. Respond to the following message in a clear, friendly manner. Do not use any markdown formatting, code blocks, or special characters like **, \`, or #. Just provide a plain text response.`;
-
-        // Generate content using the model
-        const chat = model.startChat({
-          history: [
-            {
-              role: "user",
-              parts: [{ text: prompt }],
-            },
-            {
-              role: "model",
-              parts: [
-                { text: "I'm ready to help! What would you like to know?" },
-              ],
-            },
-          ],
-        });
-
-        const result = await chat.sendMessage(message);
-        const response = await result.response;
-        let text = response.text();
-
-        // Clean up the response
-        text = text
-          .replace(/[\*_`#]/g, "") // Remove markdown characters
-          .replace(/\n\s*\n/g, "\n") // Remove extra newlines
-          .trim();
-
-        return res.json({
-          type: "text",
-          content: text,
-        });
-      } catch (error) {
-        console.error("AI API Error:", error);
-        return res.status(500).json({
-          error: "Failed to process your request",
-          details: error.message,
-        });
       }
-    });
+    );
 
     console.log("Connected to MongoDB successfully!");
   } catch (err) {

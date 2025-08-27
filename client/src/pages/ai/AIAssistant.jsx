@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import AIMessage from "../../components/ai/AIMessage";
 import AIPromptSuggestions from "../../components/ai/AIPromptSuggestions";
-import useAxiosCommon from "../../hooks/useAxiosCommon";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 const initialMessages = [
   {
@@ -17,7 +17,7 @@ export default function AIAssistant() {
   const [messages, setMessages] = useState(initialMessages);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const axiosCommon = useAxiosCommon();
+  const axiosSecure = useAxiosSecure();
 
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
@@ -36,7 +36,7 @@ export default function AIAssistant() {
 
     try {
       // Call our API endpoint
-      const response = await axiosCommon.post("/ai/assist", {
+      const response = await axiosSecure.post("/ai/assist", {
         message: inputValue,
       });
 
