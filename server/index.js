@@ -66,6 +66,7 @@ async function run() {
     const usersCollection = database.collection("users");
     const commentsCollection = database.collection("comments");
     const reportsCollection = database.collection("reports");
+    const paymentsCollection = database.collection("payments");
 
     // Middleware to verify user role
     const verifyUserRole = (...allowedRoles) => {
@@ -593,6 +594,36 @@ async function run() {
         }
       }
     );
+
+    // API route to add payment
+    app.post("/payments", async (req, res) => {
+      try {
+        const paymentInfo = req.body;
+        const result = await paymentsCollection.insertOne(paymentInfo);
+        res.status(200).json({
+          message: "Payment added successfully!",
+          payment: result.insertedId,
+        });
+      } catch (err) {
+        console.error("Error adding payment: ", err.message);
+        res.status(500).json({
+          message: "Failed to add payment.",
+        });
+      }
+    });
+
+    // API route to get payments
+    app.get("/payments", async (req, res) => {
+      try {
+        const payments = await paymentsCollection.find().toArray();
+        res.status(200).json(payments);
+      } catch (err) {
+        console.error("Error fetching payments: ", err.message);
+        res.status(500).json({
+          message: "Failed to fetch payments.",
+        });
+      }
+    });
 
     // API route for AI assistant
     app.post("/ai/assist", async (req, res) => {
