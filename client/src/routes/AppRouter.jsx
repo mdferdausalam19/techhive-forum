@@ -14,6 +14,7 @@ import CreatePost from "../pages/post/CreatePost";
 import MyPosts from "../pages/post/MyPosts";
 import PremiumRoute from "./PremiumRoute";
 import AdminLayout from "../layouts/AdminLayout";
+import AdminDashboard from "../pages/admin/AdminDashboard";
 
 export const router = createBrowserRouter([
   {
@@ -92,6 +93,11 @@ export const router = createBrowserRouter([
   {
     path: "/admin",
     element: <AdminLayout />,
-    children: [],
+    children: [
+      {
+        index: true,
+        element: <AdminDashboard />,
+      },
+    ],
   },
 ]);
