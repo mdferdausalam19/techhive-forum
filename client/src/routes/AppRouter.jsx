@@ -13,6 +13,7 @@ import AIAssistant from "../pages/ai/AIAssistant";
 import CreatePost from "../pages/post/CreatePost";
 import MyPosts from "../pages/post/MyPosts";
 import PremiumRoute from "./PremiumRoute";
+import AdminLayout from "../layouts/AdminLayout";
 
 export const router = createBrowserRouter([
   {
@@ -87,5 +88,10 @@ export const router = createBrowserRouter([
   {
     path: "/sign-up",
     element: <SignUp />,
+  },
+  {
+    path: "/admin",
+    element: <AdminLayout />,
+    children: [],
   },
 ]);
