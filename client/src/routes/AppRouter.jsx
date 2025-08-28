@@ -19,6 +19,7 @@ import UsersPage from "../pages/admin/UsersPage";
 import PostsPage from "../pages/admin/PostsPage";
 import ReportedCommentsPage from "../pages/admin/ReportedCommentsPage";
 import AnnouncementsPage from "../pages/admin/AnnouncementsPage";
+import PaymentsPage from "../pages/admin/PaymentsPage";
 
 export const router = createBrowserRouter([
   {
@@ -109,6 +110,10 @@ export const router = createBrowserRouter([
       {
         path: "posts",
         element: <PostsPage />,
+      },
+      {
+        path: "payments",
+        element: <PaymentsPage />,
       },
       {
         path: "reported-comments",
