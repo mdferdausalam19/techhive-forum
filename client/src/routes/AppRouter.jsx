@@ -18,6 +18,7 @@ import AdminDashboard from "../pages/admin/AdminDashboard";
 import UsersPage from "../pages/admin/UsersPage";
 import PostsPage from "../pages/admin/PostsPage";
 import ReportedCommentsPage from "../pages/admin/ReportedCommentsPage";
+import AnnouncementsPage from "../pages/admin/AnnouncementsPage";
 
 export const router = createBrowserRouter([
   {
@@ -112,6 +113,10 @@ export const router = createBrowserRouter([
       {
         path: "reported-comments",
         element: <ReportedCommentsPage />,
+      },
+      {
+        path: "announcements",
+        element: <AnnouncementsPage />,
       },
     ],
   },
