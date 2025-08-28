@@ -15,6 +15,7 @@ import MyPosts from "../pages/post/MyPosts";
 import PremiumRoute from "./PremiumRoute";
 import AdminLayout from "../layouts/AdminLayout";
 import AdminDashboard from "../pages/admin/AdminDashboard";
+import UsersPage from "../pages/admin/UsersPage";
 
 export const router = createBrowserRouter([
   {
@@ -97,6 +98,10 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <AdminDashboard />,
+      },
+      {
+        path: "users",
+        element: <UsersPage />,
       },
     ],
   },
