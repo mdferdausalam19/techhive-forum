@@ -16,6 +16,7 @@ import PremiumRoute from "./PremiumRoute";
 import AdminLayout from "../layouts/AdminLayout";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import UsersPage from "../pages/admin/UsersPage";
+import PostsPage from "../pages/admin/PostsPage";
 
 export const router = createBrowserRouter([
   {
@@ -96,12 +97,16 @@ export const router = createBrowserRouter([
     element: <AdminLayout />,
     children: [
       {
-        index: true,
+        path: "dashboard",
         element: <AdminDashboard />,
       },
       {
         path: "users",
         element: <UsersPage />,
+      },
+      {
+        path: "posts",
+        element: <PostsPage />,
       },
     ],
   },

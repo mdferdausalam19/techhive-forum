@@ -21,7 +21,7 @@ export default function AdminSidebar({ onNavigate }) {
 
   const navItems = [
     {
-      to: "/admin",
+      to: "/admin/dashboard",
       icon: <FiHome className="w-5 h-5" />,
       label: "Dashboard",
     },
