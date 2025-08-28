@@ -99,7 +99,7 @@ export const router = createBrowserRouter([
     element: <AdminLayout />,
     children: [
       {
-        path: "dashboard",
+        index: true,
         element: <AdminDashboard />,
       },
       {

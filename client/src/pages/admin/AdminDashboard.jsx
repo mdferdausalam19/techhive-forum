@@ -1,6 +1,13 @@
-import { FiUsers } from "react-icons/fi";
-import { FiFileText } from "react-icons/fi";
+import {
+  FiUsers,
+  FiFileText,
+  FiDollarSign,
+  FiUser,
+  FiMessageSquare,
+} from "react-icons/fi";
 import StatCard from "../../components/admin/StatCard";
+import AdminTable from "../../components/admin/AdminTable";
+import { format } from "date-fns";
 
 export default function AdminDashboard() {
   const stats = {
@@ -10,6 +17,8 @@ export default function AdminDashboard() {
     generalUsers: 60,
     premiumUsers: 18,
     totalLikes: 2100,
+    totalRevenue: 528.93,
+    monthlyGrowth: 12.5,
   };
 
   const users = [
@@ -60,18 +69,62 @@ export default function AdminDashboard() {
     },
   ];
 
-  // Status badge component
-  const StatusBadge = ({ status }) => (
-    <span
-      className={`px-2.5 py-1 rounded-full text-xs font-medium ${
-        status === "Premium"
-          ? "bg-yellow-100 text-yellow-800"
-          : "bg-blue-100 text-blue-800"
-      }`}
-    >
-      {status}
-    </span>
-  );
+  const payments = [
+    {
+      id: "PMT-1001",
+      user: { id: "user1", name: "Alice Johnson", email: "alice@example.com" },
+      amount: 9.99,
+      plan: "Monthly Premium",
+      status: "completed",
+      date: new Date("2025-08-27T14:30:00"),
+      method: "Credit Card",
+    },
+    {
+      id: "PMT-1002",
+      user: { id: "user2", name: "Bob Smith", email: "bob@example.com" },
+      amount: 99.99,
+      plan: "Annual Premium",
+      status: "completed",
+      date: new Date("2025-08-26T10:15:00"),
+      method: "PayPal",
+    },
+    {
+      id: "PMT-1003",
+      user: {
+        id: "user3",
+        name: "Charlie Brown",
+        email: "charlie@example.com",
+      },
+      amount: 9.99,
+      plan: "Monthly Premium",
+      status: "pending",
+      date: new Date("2025-08-28T09:45:00"),
+      method: "Credit Card",
+    },
+  ];
+
+  const formatDate = (date) => format(new Date(date), "MMM d, yyyy");
+
+  const getStatusBadge = (status) => {
+    const statusConfig = {
+      completed: { bg: "bg-green-100 text-green-800", text: "Completed" },
+      pending: { bg: "bg-yellow-100 text-yellow-800", text: "Pending" },
+      failed: { bg: "bg-red-100 text-red-800", text: "Failed" },
+    };
+
+    const config = statusConfig[status] || {
+      bg: "bg-gray-100 text-gray-800",
+      text: status,
+    };
+
+    return (
+      <span
+        className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${config.bg}`}
+      >
+        {config.text}
+      </span>
+    );
+  };
 
   return (
     <div className="space-y-8">
@@ -80,144 +133,185 @@ export default function AdminDashboard() {
         <StatCard
           label="Total Users"
           value={stats.totalUsers}
-          icon="👥"
-          color="from-blue-500 to-blue-600"
+          icon={FiUsers}
+          color="blue"
+          trend={stats.monthlyGrowth}
         />
         <StatCard
           label="Total Posts"
           value={stats.totalPosts}
-          icon="📝"
-          color="from-purple-500 to-purple-600"
+          icon={FiFileText}
+          color="green"
+          trend={8.2}
         />
         <StatCard
           label="Total Comments"
           value={stats.totalComments}
-          icon="💬"
-          color="from-green-500 to-green-600"
+          icon={FiMessageSquare}
+          color="purple"
+          trend={15.3}
         />
         <StatCard
-          label="Total Likes"
-          value={stats.totalLikes}
-          icon="🤍"
-          color="from-pink-500 to-pink-600"
+          label="Total Revenue"
+          value={stats.totalRevenue}
+          icon={FiDollarSign}
+          color="indigo"
+          trend={stats.monthlyGrowth}
         />
       </div>
 
-      {/* Users Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-800 flex items-center">
-            <FiUsers className="mr-2 text-blue-600" />
-            Recent Users
-          </h3>
+      {/* Recent Users */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-semibold text-gray-900">Recent Users</h2>
+          <button className="text-sm font-medium text-blue-600 hover:text-blue-800">
+            View All
+          </button>
         </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Email
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Joined
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {users.map((user) => (
-                <tr
-                  key={user.uid}
-                  className="hover:bg-gray-50 transition-colors"
-                >
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium">
-                        {user.name.charAt(0)}
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">
-                          {user.name}
-                        </div>
-                      </div>
+        <AdminTable
+          headers={[
+            { key: "name", label: "Name" },
+            { key: "email", label: "Email" },
+            { key: "role", label: "Role" },
+            { key: "joinDate", label: "Join Date" },
+          ]}
+          data={users}
+          keyField="uid"
+          emptyMessage="No users found"
+          renderRow={(user) => (
+            <>
+              <td className="px-6 py-4 whitespace-nowrap">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                    <FiUser className="h-5 w-5" />
+                  </div>
+                  <div className="ml-4">
+                    <div className="text-sm font-medium text-gray-900">
+                      {user.name}
                     </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {user.email}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <StatusBadge status={user.role} />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(user.joinDate).toLocaleDateString()}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </div>
+                </div>
+              </td>
+              <td className="px-6 py-4 text-sm text-gray-500">{user.email}</td>
+              <td className="px-6 py-4">
+                <span
+                  className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                    user.role === "Premium"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : "bg-blue-100 text-blue-800"
+                  }`}
+                >
+                  {user.role}
+                </span>
+              </td>
+              <td className="px-6 py-4 text-sm text-gray-500">
+                {new Date(user.joinDate).toLocaleDateString()}
+              </td>
+            </>
+          )}
+        />
       </div>
 
-      {/* Posts Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-800 flex items-center">
-            <FiFileText className="mr-2 text-blue-600" />
-            Recent Posts
-          </h3>
+      {/* Recent Posts */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-semibold text-gray-900">Recent Posts</h2>
+          <button className="text-sm font-medium text-blue-600 hover:text-blue-800">
+            View All
+          </button>
         </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Title
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Author
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Category
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Date
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {posts.map((post) => (
-                <tr
-                  key={post._id}
-                  className="hover:bg-gray-50 transition-colors"
+        <AdminTable
+          headers={[
+            { key: "title", label: "Title" },
+            { key: "author", label: "Author" },
+            { key: "category", label: "Category" },
+            { key: "date", label: "Date" },
+          ]}
+          data={posts}
+          keyField="_id"
+          emptyMessage="No posts found"
+          renderRow={(post) => (
+            <>
+              <td className="px-6 py-4">
+                <div className="text-sm font-medium text-gray-900">
+                  {post.title}
+                </div>
+              </td>
+              <td className="px-6 py-4 text-sm text-gray-500">{post.author}</td>
+              <td className="px-6 py-4">
+                <span
+                  className={`px-2.5 py-1 rounded-full text-xs font-medium ${
+                    post.category === "AI"
+                      ? "bg-purple-100 text-purple-800"
+                      : post.category === "Premium"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : "bg-gray-100 text-gray-800"
+                  }`}
                 >
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      {post.title}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">{post.author}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      <span className="bg-green-200 px-2 py-1 rounded">
-                        {post.category}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(post.date).toLocaleDateString()}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  {post.category}
+                </span>
+              </td>
+              <td className="px-6 py-4 text-sm text-gray-500">
+                {formatDate(post.date)}
+              </td>
+            </>
+          )}
+        />
+      </div>
+
+      {/* Recent Payments */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-lg font-semibold text-gray-900">
+            Recent Payments
+          </h2>
+          <button className="text-sm font-medium text-blue-600 hover:text-blue-800">
+            View All
+          </button>
         </div>
+        <AdminTable
+          headers={[
+            { key: "user", label: "User" },
+            { key: "amount", label: "Amount" },
+            { key: "plan", label: "Plan" },
+            { key: "status", label: "Status" },
+            { key: "date", label: "Date" },
+          ]}
+          data={payments}
+          keyField="id"
+          emptyMessage="No payments found"
+          renderRow={(payment) => (
+            <>
+              <td className="px-6 py-4">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+                    <FiUser className="h-5 w-5" />
+                  </div>
+                  <div className="ml-4">
+                    <div className="text-sm font-medium text-gray-900">
+                      {payment.user.name}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {payment.user.email}
+                    </div>
+                  </div>
+                </div>
+              </td>
+              <td className="px-6 py-4">
+                <div className="text-sm font-medium text-gray-900">
+                  ${payment.amount.toFixed(2)}
+                </div>
+              </td>
+              <td className="px-6 py-4 text-sm text-gray-500">
+                {payment.plan}
+              </td>
+              <td className="px-6 py-4">{getStatusBadge(payment.status)}</td>
+              <td className="px-6 py-4 text-sm text-gray-500">
+                {formatDate(payment.date)}
+              </td>
+            </>
+          )}
+        />
       </div>
     </div>
   );

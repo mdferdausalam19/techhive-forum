@@ -1,15 +1,17 @@
-export default function StatCard({ label, value, icon, color }) {
+export default function StatCard({ label, value, icon: Icon, color }) {
   return (
     <div
-      className={`rounded-xl shadow-lg p-6 flex flex-col bg-gradient-to-br ${color} text-white transition-transform hover:scale-[1.02]`}
+      className={`rounded-xl shadow-lg p-6 flex flex-col bg-gradient-to-br ${color} text-blue-500 transition-transform hover:scale-[1.02]`}
     >
       <div className="flex justify-between items-start">
         <div>
           <p className="text-sm font-medium opacity-90 mb-1">{label}</p>
           <p className="text-3xl font-bold">{value}</p>
         </div>
-        <div className="bg-white/20 p-3 rounded-lg">
-          <span className="text-2xl">{icon}</span>
+        <div className="bg-white/20 p-3 rounded-lg border">
+          <span className="text-2xl">
+            <Icon />
+          </span>
         </div>
       </div>
     </div>

@@ -8,6 +8,7 @@ import {
   FiBell,
   FiChevronLeft,
   FiChevronRight,
+  FiDollarSign,
 } from "react-icons/fi";
 
 export default function AdminSidebar({ onNavigate }) {
@@ -21,7 +22,7 @@ export default function AdminSidebar({ onNavigate }) {
 
   const navItems = [
     {
-      to: "/admin/dashboard",
+      to: "/admin",
       icon: <FiHome className="w-5 h-5" />,
       label: "Dashboard",
     },
@@ -34,6 +35,11 @@ export default function AdminSidebar({ onNavigate }) {
       to: "/admin/posts",
       icon: <FiFileText className="w-5 h-5" />,
       label: "Posts Management",
+    },
+    {
+      to: "/admin/payments",
+      icon: <FiDollarSign className="w-5 h-5" />,
+      label: "Payments",
     },
     {
       to: "/admin/reported-comments",
@@ -79,12 +85,15 @@ export default function AdminSidebar({ onNavigate }) {
                 className={({ isActive }) => `
                   flex items-center p-3 rounded-lg transition-colors
                   ${
-                    isActive
+                    isActive ||
+                    (item.to === "/admin" &&
+                      window.location.pathname === "/admin")
                       ? "bg-blue-700 text-white"
                       : "text-blue-100 hover:bg-blue-600"
                   }
                   ${collapsed ? "justify-center" : "space-x-3"}
                 `}
+                end={item.to === "/admin"}
                 onClick={() => handleNavigation(item.to)}
               >
                 <span className="flex-shrink-0">{item.icon}</span>
