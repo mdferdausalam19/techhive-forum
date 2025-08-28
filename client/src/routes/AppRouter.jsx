@@ -17,6 +17,7 @@ import AdminLayout from "../layouts/AdminLayout";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import UsersPage from "../pages/admin/UsersPage";
 import PostsPage from "../pages/admin/PostsPage";
+import ReportedCommentsPage from "../pages/admin/ReportedCommentsPage";
 
 export const router = createBrowserRouter([
   {
@@ -107,6 +108,10 @@ export const router = createBrowserRouter([
       {
         path: "posts",
         element: <PostsPage />,
+      },
+      {
+        path: "reported-comments",
+        element: <ReportedCommentsPage />,
       },
     ],
   },
