@@ -94,7 +94,7 @@ export default function AnnouncementsModal({
                 onClick={onCreateAnnouncement}
               >
                 <FiSend className="-ml-1 mr-2 h-4 w-4" />
-                Publish Now
+                Create Announcement
               </button>
             </div>
           </div>

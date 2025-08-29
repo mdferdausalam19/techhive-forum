@@ -57,8 +57,6 @@ export default function PostsPage() {
       <AdminPageHeader
         title="Posts Management"
         description="Manage all posts and their content"
-        buttonText="Create New Post"
-        onButtonClick={() => console.log("Create new post")}
         icon={FiFileText}
       />
 

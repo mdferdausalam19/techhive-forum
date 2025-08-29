@@ -1,15 +1,23 @@
 import { FaBullhorn } from "react-icons/fa";
+import { useQuery } from "@tanstack/react-query";
+import useAxiosCommon from "../../hooks/useAxiosCommon";
+import LoadingSpinner from "../../components/shared/LoadingSpinner";
+import { format } from "date-fns";
 
 export default function Announcement() {
-  const latestAnnouncement = {
-    title: "Welcome to TechHive Forum!",
-    content:
-      "We're excited to announce our new community features and improvements. Stay tuned for more updates!",
-    date: "August 19, 2025",
-    author: "Admin Team",
-  };
+  const axiosCommon = useAxiosCommon();
 
-  if (!latestAnnouncement) return null;
+  const { data: announcements = [], isLoading } = useQuery({
+    queryKey: ["announcements"],
+    queryFn: async () => {
+      const { data } = await axiosCommon.get("/announcements");
+      return data;
+    },
+  });
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -25,22 +33,28 @@ export default function Announcement() {
             <div className="ml-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-2xl font-bold text-gray-900">
-                  Announcement
+                  Announcements
                 </h2>
               </div>
-              <div className="mt-2">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  {latestAnnouncement.title}
-                </h3>
-                <p className="mt-1 text-gray-600">
-                  {latestAnnouncement.content}
+              {announcements.length > 0 ? (
+                announcements.map((announcement) => (
+                  <div key={announcement._id}>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      {announcement.title}
+                    </h3>
+                    <p className="mt-1 text-gray-600">{announcement.content}</p>
+                    <div className="mt-3 flex flex-col md:flex-row md:items-center text-sm text-gray-500">
+                      <span>
+                        Posted on {format(announcement.createdAt, "PP")}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-600 text-center mt-4">
+                  No announcements available.
                 </p>
-                <div className="mt-3 flex flex-col md:flex-row md:items-center text-sm text-gray-500">
-                  <span>Posted on {latestAnnouncement.date}</span>
-                  <span className="mx-2 hidden md:inline">•</span>
-                  <span>By {latestAnnouncement.author}</span>
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </div>

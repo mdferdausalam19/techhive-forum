@@ -3,46 +3,39 @@ import AdminPageHeader from "../../components/admin/AdminPageHeader";
 import AdminTable from "../../components/admin/AdminTable";
 import { FiBell, FiSearch } from "react-icons/fi";
 import AnnouncementsModal from "../../components/admin/AnnouncementsModal";
+import useAuth from "../../hooks/useAuth";
+import useAxiosCommon from "../../hooks/useAxiosCommon";
+import { toast } from "react-hot-toast";
+import { useQuery } from "@tanstack/react-query";
+import LoadingSpinner from "../../components/shared/LoadingSpinner";
+import { format } from "date-fns";
 
 export default function AnnouncementsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const { user } = useAuth();
+  const axiosCommon = useAxiosCommon();
   const [newAnnouncement, setNewAnnouncement] = useState({
     title: "",
     content: "",
+    author: {
+      id: user?.uid,
+      name: user?.displayName,
+      avatar: user?.photoURL,
+      email: user?.email,
+    },
+    createdAt: "",
+    role: "Admin",
+    visibility: "private",
   });
 
-  const announcements = [
-    {
-      id: 1,
-      title: "Scheduled Maintenance",
-      content:
-        "We will be performing scheduled maintenance on August 30th from 2:00 AM to 4:00 AM UTC.",
-      author: "Admin",
-      createdAt: "2025-08-25T10:30:00",
-      publishedAt: "2025-08-25T10:35:00",
-      views: 1245,
+  const { data: announcements = [], isLoading } = useQuery({
+    queryKey: ["announcements"],
+    queryFn: async () => {
+      const { data } = await axiosCommon.get("/announcements");
+      return data;
     },
-    {
-      id: 2,
-      title: "New Feature: Dark Mode",
-      content:
-        "We've added a dark mode feature! You can now switch between light and dark themes in your account settings.",
-      author: "Admin",
-      createdAt: "2025-08-20T14:15:00",
-      publishedAt: "2025-08-20T14:20:00",
-      views: 2456,
-    },
-    {
-      id: 3,
-      title: "Community Guidelines Update",
-      content:
-        "We've updated our community guidelines. Please review the changes at...",
-      author: "Moderator",
-      createdAt: "2025-08-27T09:45:00",
-      views: 0,
-    },
-  ];
+  });
 
   const filteredAnnouncements = announcements.filter((announcement) => {
     const matchesSearch =
@@ -52,13 +45,41 @@ export default function AnnouncementsPage() {
   });
 
   const handleCreateAnnouncement = () => {
-    // Handle create announcement
-    console.log("Create announcement:", newAnnouncement);
-    setIsCreateModalOpen(false);
-    setNewAnnouncement({
-      title: "",
-      content: "",
-    });
+    try {
+      const announcement = {
+        title: newAnnouncement.title,
+        content: newAnnouncement.content,
+        author: {
+          id: user?.uid,
+          name: user?.displayName,
+          avatar: user?.photoURL,
+          email: user?.email,
+        },
+        createdAt: new Date().toISOString(),
+        role: "Admin",
+        visibility: "private",
+      };
+      axiosCommon.post("/admin/announcements", announcement);
+      toast.success("Announcement created successfully!");
+      setNewAnnouncement({
+        title: "",
+        content: "",
+        role: "Admin",
+        author: {
+          id: user?.uid,
+          name: user?.displayName,
+          avatar: user?.photoURL,
+          email: user?.email,
+        },
+        createdAt: "",
+        visibility: "private",
+      });
+    } catch (err) {
+      console.error("Error creating announcement: ", err.message);
+      toast.error("Failed to create announcement. Please try again.");
+    } finally {
+      setIsCreateModalOpen(false);
+    }
   };
 
   const handleEdit = (announcement) => {
@@ -74,6 +95,10 @@ export default function AnnouncementsPage() {
       console.log("Delete announcement:", announcement.id);
     }
   };
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <div className="space-y-6">
@@ -107,6 +132,7 @@ export default function AnnouncementsPage() {
       <AdminTable
         headers={[
           { key: "title", label: "Announcement" },
+          { key: "author", label: "Author" },
           { key: "date", label: "Date" },
         ]}
         data={filteredAnnouncements}
@@ -125,23 +151,12 @@ export default function AnnouncementsPage() {
               </div>
             </td>
             <td className="px-6 py-4 whitespace-nowrap">
-              <div className="text-sm text-gray-900">
-                {announcement.views.toLocaleString()} views
-              </div>
               <div className="text-xs text-gray-500">
-                By {announcement.author}
+                By {announcement.author.name}
               </div>
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              <div>
-                Created: {new Date(announcement.createdAt).toLocaleDateString()}
-              </div>
-              {announcement.publishedAt && (
-                <div>
-                  Published:{" "}
-                  {new Date(announcement.publishedAt).toLocaleDateString()}
-                </div>
-              )}
+              <div>Created: {format(announcement.createdAt, "PP")}</div>
             </td>
           </>
         )}
