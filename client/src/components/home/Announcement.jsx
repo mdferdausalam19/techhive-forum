@@ -38,7 +38,10 @@ export default function Announcement() {
               </div>
               {announcements.length > 0 ? (
                 announcements.map((announcement) => (
-                  <div key={announcement._id}>
+                  <div
+                    key={announcement._id}
+                    className="mb-6 border-t border-blue-400 pt-2 mt-4"
+                  >
                     <h3 className="text-lg font-semibold text-gray-900">
                       {announcement.title}
                     </h3>

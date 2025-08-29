@@ -1,20 +1,26 @@
 import React, { useState } from "react";
 import AdminPageHeader from "../../components/admin/AdminPageHeader";
 import AdminTable from "../../components/admin/AdminTable";
-import { FiBell, FiSearch } from "react-icons/fi";
+import { FiBell, FiSearch, FiEdit2, FiTrash2 } from "react-icons/fi";
 import AnnouncementsModal from "../../components/admin/AnnouncementsModal";
+import EditAnnouncementModal from "../../components/admin/EditAnnouncementModal";
+import DeleteAnnouncementModal from "../../components/admin/DeleteAnnouncementModal";
 import useAuth from "../../hooks/useAuth";
 import useAxiosCommon from "../../hooks/useAxiosCommon";
 import { toast } from "react-hot-toast";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import LoadingSpinner from "../../components/shared/LoadingSpinner";
 import { format } from "date-fns";
 
 export default function AnnouncementsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const { user } = useAuth();
   const axiosCommon = useAxiosCommon();
+  const queryClient = useQueryClient();
   const [newAnnouncement, setNewAnnouncement] = useState({
     title: "",
     content: "",
@@ -82,17 +88,43 @@ export default function AnnouncementsPage() {
     }
   };
 
-  const handleEdit = (announcement) => {
-    // Handle edit announcement
-    console.log("Edit announcement:", announcement.id);
+  const handleEditClick = (announcement) => {
+    setSelectedAnnouncement(announcement);
+    setIsEditModalOpen(true);
   };
 
-  const handleDelete = (announcement) => {
-    // Handle delete announcement
-    if (
-      window.confirm(`Are you sure you want to delete "${announcement.title}"?`)
-    ) {
-      console.log("Delete announcement:", announcement.id);
+  const handleDeleteClick = (announcement) => {
+    setSelectedAnnouncement(announcement);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleEdit = async (updatedAnnouncement) => {
+    try {
+      await axiosCommon.put(`/admin/announcements/${updatedAnnouncement._id}`, {
+        ...updatedAnnouncement,
+      });
+      await queryClient.invalidateQueries(["announcements"]);
+      toast.success("Announcement updated successfully!");
+      setIsEditModalOpen(false);
+    } catch (err) {
+      console.error("Error updating announcement: ", err.message);
+      toast.error("Failed to update announcement. Please try again.");
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!selectedAnnouncement) return;
+
+    try {
+      await axiosCommon.delete(
+        `/admin/announcements/${selectedAnnouncement._id}`
+      );
+      await queryClient.invalidateQueries(["announcements"]);
+      toast.success("Announcement deleted successfully!");
+      setIsDeleteModalOpen(false);
+    } catch (err) {
+      console.error("Error deleting announcement: ", err.message);
+      toast.error("Failed to delete announcement. Please try again.");
     }
   };
 
@@ -138,8 +170,8 @@ export default function AnnouncementsPage() {
         data={filteredAnnouncements}
         keyField="id"
         emptyMessage="No announcements found"
-        onEdit={handleEdit}
-        onDelete={handleDelete}
+        onEdit={handleEditClick}
+        onDelete={handleDeleteClick}
         renderRow={(announcement) => (
           <>
             <td className="px-6 py-4">
@@ -151,12 +183,19 @@ export default function AnnouncementsPage() {
               </div>
             </td>
             <td className="px-6 py-4 whitespace-nowrap">
-              <div className="text-xs text-gray-500">
+              <div className="text-sm text-gray-500">
                 By {announcement.author.name}
               </div>
             </td>
             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              <div>Created: {format(announcement.createdAt, "PP")}</div>
+              <div>
+                Created: {format(new Date(announcement.createdAt), "PP")}
+              </div>
+              {announcement.updatedAt && (
+                <div>
+                  Updated: {format(new Date(announcement.updatedAt), "PP")}
+                </div>
+              )}
             </td>
           </>
         )}
@@ -169,6 +208,24 @@ export default function AnnouncementsPage() {
           newAnnouncement={newAnnouncement}
           setNewAnnouncement={setNewAnnouncement}
           onCreateAnnouncement={handleCreateAnnouncement}
+        />
+      )}
+
+      {isEditModalOpen && selectedAnnouncement && (
+        <EditAnnouncementModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          announcement={selectedAnnouncement}
+          onSave={handleEdit}
+        />
+      )}
+
+      {isDeleteModalOpen && selectedAnnouncement && (
+        <DeleteAnnouncementModal
+          isOpen={isDeleteModalOpen}
+          onClose={() => setIsDeleteModalOpen(false)}
+          announcement={selectedAnnouncement}
+          onDelete={handleDelete}
         />
       )}
     </div>
