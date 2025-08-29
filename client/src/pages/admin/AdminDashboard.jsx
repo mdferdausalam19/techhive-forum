@@ -26,7 +26,9 @@ export default function AdminDashboard() {
   const { data: users = [], isLoading: usersLoading } = useQuery({
     queryKey: ["admin-users"],
     queryFn: async () => {
-      const { data } = await axiosCommon.get("/admin/users/recent");
+      const { data } = await axiosCommon.get(
+        `/admin/users/recent?limit=${5}&sort=${-1}`
+      );
       return data;
     },
   });
@@ -34,7 +36,9 @@ export default function AdminDashboard() {
   const { data: posts = [], isLoading: postsLoading } = useQuery({
     queryKey: ["admin-posts"],
     queryFn: async () => {
-      const { data } = await axiosCommon.get("/admin/posts/recent");
+      const { data } = await axiosCommon.get(
+        `/admin/posts/recent?limit=${5}&sort=${-1}`
+      );
       return data;
     },
   });
@@ -42,7 +46,9 @@ export default function AdminDashboard() {
   const { data: payments = [], isLoading: paymentsLoading } = useQuery({
     queryKey: ["admin-payments"],
     queryFn: async () => {
-      const { data } = await axiosCommon.get("/admin/payments/recent");
+      const { data } = await axiosCommon.get(
+        `/admin/payments/recent?limit=${5}&sort=${-1}`
+      );
       return data;
     },
   });
