@@ -67,6 +67,7 @@ async function run() {
     const commentsCollection = database.collection("comments");
     const reportsCollection = database.collection("reports");
     const paymentsCollection = database.collection("payments");
+    const announcementsCollection = database.collection("announcements");
 
     // Middleware to verify user role
     const verifyUserRole = (...allowedRoles) => {
@@ -725,7 +726,7 @@ async function run() {
       }
     );
 
-    // API route to get users (recent, all)
+    // API route to get users
     app.get(
       "/admin/users",
       // verifyToken,
@@ -749,7 +750,7 @@ async function run() {
       }
     );
 
-    // API route to get posts (recent, all)
+    // API route to get posts
     app.get(
       "/admin/posts",
       // verifyToken,
@@ -773,7 +774,7 @@ async function run() {
       }
     );
 
-    // API route to get payments (recent, all)
+    // API route to get payments
     app.get(
       "/admin/payments",
       // verifyToken,
@@ -796,6 +797,40 @@ async function run() {
         }
       }
     );
+
+    // API route to add announcement
+    app.post(
+      "/admin/announcements",
+      // verifyToken,
+      // verifyUserRole("Admin"),
+      async (req, res) => {
+        try {
+          const announcement = req.body;
+          const result = await announcementsCollection.insertOne(announcement);
+          res.status(200).json({
+            message: "Announcement added successfully!",
+            announcement: result.insertedId,
+          });
+        } catch (err) {
+          console.error("Error adding announcement: ", err.message);
+          res.status(500).json({
+            message: "Failed to add announcement.",
+          });
+        }
+      }
+    );
+
+    // API route to get announcements
+    app.get("/announcements", async (req, res) => {
+      try {
+        const announcements = await announcementsCollection.find({}).toArray();
+
+        res.json(announcements);
+      } catch (error) {
+        console.error("Error fetching recent announcements:", error);
+        res.status(500).json({ error: "Failed to fetch recent announcements" });
+      }
+    });
 
     // API route for AI assistant
     app.post(
