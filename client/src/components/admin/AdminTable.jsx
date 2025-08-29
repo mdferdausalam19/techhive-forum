@@ -37,7 +37,7 @@ export default function AdminTable({
               data.map((item, index) => (
                 <tr
                   key={item[keyField] || index}
-                  className="hover:bg-gray-50 transition-colors"
+                  className="hover:bg-gray-50 transition-colors text-left"
                 >
                   {renderRow ? (
                     renderRow(item, index)

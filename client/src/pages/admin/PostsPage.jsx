@@ -4,69 +4,39 @@ import AdminTable from "../../components/admin/AdminTable";
 import {
   FiFileText,
   FiSearch,
-  FiFilter,
-  FiEye,
   FiMessageSquare,
   FiThumbsUp,
 } from "react-icons/fi";
+import useAxiosCommon from "../../hooks/useAxiosCommon";
+import { useQuery } from "@tanstack/react-query";
+import LoadingSpinner from "../../components/shared/LoadingSpinner";
+import { format } from "date-fns";
 
 export default function PostsPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  
-  const posts = [
-    {
-      id: 1,
-      title: "Getting Started with React Hooks",
-      author: "Alice Johnson",
-      category: "React",
-      status: "published",
-      date: "2025-08-15",
-      views: 1245,
-      comments: 23,
-      likes: 87,
+
+  const axiosCommon = useAxiosCommon();
+
+  const { data: posts = [], isLoading: postsLoading } = useQuery({
+    queryKey: ["admin-posts-all"],
+    queryFn: async () => {
+      const { data } = await axiosCommon.get(
+        `/admin/posts?limit=${5}&sort=${1}`
+      );
+      return data;
     },
-    {
-      id: 2,
-      title: "Advanced TypeScript Patterns",
-      author: "Bob Smith",
-      category: "TypeScript",
-      status: "draft",
-      date: "2025-08-20",
-      views: 0,
-      comments: 0,
-      likes: 0,
-    },
-    {
-      id: 3,
-      title: "State Management with Redux Toolkit",
-      author: "Charlie Brown",
-      category: "Redux",
-      status: "published",
-      date: "2025-08-25",
-      views: 876,
-      comments: 15,
-      likes: 42,
-    },
-  ];
+  });
 
   const filteredPosts = posts.filter((post) => {
-    const matchesSearch =
-      post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      post.author.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter =
-      statusFilter === "all" || post.status === statusFilter;
-    return matchesSearch && matchesFilter;
+    const matchesSearch = post.title
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+    return matchesSearch;
   });
 
   const handleView = (post) => {
     // Handle view post
     console.log("View post:", post);
-  };
-
-  const handleEdit = (post) => {
-    // Handle edit post
-    console.log("Edit post:", post);
   };
 
   const handleDelete = (post) => {
@@ -75,6 +45,12 @@ export default function PostsPage() {
       console.log("Delete post:", post);
     }
   };
+
+  const formatDate = (date) => format(new Date(date), "MMM d, yyyy");
+
+  if (postsLoading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <div className="space-y-6">
@@ -101,21 +77,6 @@ export default function PostsPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <div className="flex items-center space-x-3">
-            <div className="flex items-center">
-              <FiFilter className="h-5 w-5 text-gray-400 mr-2" />
-              <select
-                className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-              >
-                <option value="all">All Status</option>
-                <option value="published">Published</option>
-                <option value="draft">Draft</option>
-                <option value="archived">Archived</option>
-              </select>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -125,14 +86,12 @@ export default function PostsPage() {
           { key: "title", label: "Post" },
           { key: "author", label: "Author" },
           { key: "category", label: "Category" },
-          { key: "status", label: "Status" },
           { key: "stats", label: "Statistics" },
         ]}
         data={filteredPosts}
         keyField="id"
         emptyMessage="No posts found matching your criteria"
         onView={handleView}
-        onEdit={handleEdit}
         onDelete={handleDelete}
         renderRow={(post) => (
           <>
@@ -141,11 +100,18 @@ export default function PostsPage() {
                 {post.title}
               </div>
               <div className="text-xs text-gray-500 mt-1">
-                {new Date(post.date).toLocaleDateString()}
+                {formatDate(post.date)}
               </div>
             </td>
             <td className="px-6 py-4 whitespace-nowrap">
-              <div className="text-sm text-gray-900">{post.author}</div>
+              <div className="text-sm text-gray-900 flex items-center">
+                <img
+                  src={post.author.avatar}
+                  alt={post.author.name}
+                  className="w-12 h-12 rounded-full mr-2"
+                />
+                {post.author.name}
+              </div>
             </td>
             <td className="px-6 py-4 whitespace-nowrap">
               <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
@@ -153,31 +119,14 @@ export default function PostsPage() {
               </span>
             </td>
             <td className="px-6 py-4 whitespace-nowrap">
-              <span
-                className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  post.status === "published"
-                    ? "bg-green-100 text-green-800"
-                    : post.status === "draft"
-                    ? "bg-yellow-100 text-yellow-800"
-                    : "bg-gray-100 text-gray-800"
-                }`}
-              >
-                {post.status.charAt(0).toUpperCase() + post.status.slice(1)}
-              </span>
-            </td>
-            <td className="px-6 py-4 whitespace-nowrap">
               <div className="flex items-center space-x-4">
                 <div className="flex items-center text-sm text-gray-500">
-                  <FiEye className="mr-1" />
-                  {post.views}
-                </div>
-                <div className="flex items-center text-sm text-gray-500">
                   <FiMessageSquare className="mr-1" />
-                  {post.comments}
+                  {post.comments.length}
                 </div>
                 <div className="flex items-center text-sm text-gray-500">
                   <FiThumbsUp className="mr-1" />
-                  {post.likes}
+                  {post.likes.length}
                 </div>
               </div>
             </td>

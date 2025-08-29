@@ -1,49 +1,31 @@
 import React, { useState } from "react";
 import AdminPageHeader from "../../components/admin/AdminPageHeader";
 import AdminTable from "../../components/admin/AdminTable";
-import {
-  FiDollarSign,
-  FiSearch,
-  FiFilter,
-  FiDownload,
-  FiUser,
-} from "react-icons/fi";
+import { FiDollarSign, FiSearch, FiUser } from "react-icons/fi";
+import useAxiosCommon from "../../hooks/useAxiosCommon";
+import { useQuery } from "@tanstack/react-query";
+import LoadingSpinner from "../../components/shared/LoadingSpinner";
 
 export default function PaymentsPage() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
 
-  const payments = [
-    {
-      id: "PMT-1001",
-      user: { id: "user1", name: "Alice Johnson", email: "alice@example.com" },
-      amount: 9.99,
-      plan: "Lifetime Premium",
-      status: "completed",
-      date: "2025-08-27T14:30:00",
-      method: "Credit Card",
-      transactionId: "txn_1Jf8d2KZvQl4i4Xx",
+  const axiosCommon = useAxiosCommon();
+
+  const { data: payments = [], isLoading: paymentsLoading } = useQuery({
+    queryKey: ["admin-payments-all"],
+    queryFn: async () => {
+      const { data } = await axiosCommon.get(
+        `/admin/payments?limit=${5}&sort=${1}`
+      );
+      return data;
     },
-    {
-      id: "PMT-1002",
-      user: { id: "user2", name: "Bob Smith", email: "bob@example.com" },
-      amount: 99.99,
-      plan: "Lifetime Premium",
-      status: "completed",
-      date: "2025-08-26T10:15:00",
-      method: "PayPal",
-      transactionId: "txn_1Jf8d2KZvQl4i4Xy",
-    },
-  ];
+  });
 
   const filteredPayments = payments.filter((payment) => {
     const matchesSearch =
       payment.user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      payment.user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      payment.id.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesFilter =
-      statusFilter === "all" || payment.status === statusFilter;
-    return matchesSearch && matchesFilter;
+      payment.user.email.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesSearch;
   });
 
   const getStatusBadge = (status) => {
@@ -75,6 +57,10 @@ export default function PaymentsPage() {
     }).format(amount);
   };
 
+  if (paymentsLoading) {
+    return <LoadingSpinner />;
+  }
+
   return (
     <div className="space-y-6">
       <AdminPageHeader
@@ -98,20 +84,6 @@ export default function PaymentsPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <div className="flex items-center space-x-3">
-            <div className="flex items-center">
-              <FiFilter className="h-5 w-5 text-gray-400 mr-2" />
-              <select
-                className="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-              >
-                <option value="all">All Status</option>
-                <option value="completed">Completed</option>
-                <option value="failed">Failed</option>
-              </select>
-            </div>
-          </div>
         </div>
       </div>
 
@@ -121,6 +93,7 @@ export default function PaymentsPage() {
           { key: "transaction", label: "Transaction" },
           { key: "user", label: "User" },
           { key: "details", label: "Payment Details" },
+          { key: "card", label: "Card Details" },
           { key: "status", label: "Status" },
         ]}
         data={filteredPayments}
@@ -131,7 +104,7 @@ export default function PaymentsPage() {
           <>
             <td className="px-6 py-4">
               <div className="text-sm font-medium text-gray-900">
-                {payment.id}
+                {"PMT-" + payment.transactionId.slice(0, 6)}
               </div>
               <div className="text-sm text-gray-500">
                 {new Date(payment.date).toLocaleDateString()}
@@ -158,7 +131,19 @@ export default function PaymentsPage() {
               </div>
               <div className="text-sm text-gray-500">{payment.plan}</div>
               <div className="text-xs text-gray-500 mt-1">
-                {payment.method} • {payment.transactionId}
+                {payment.transactionId}
+              </div>
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap">
+              <div className="flex flex-col">
+                <div className="text-sm font-medium text-gray-900">
+                  {payment.cardName}
+                </div>
+                <div className="text-sm text-gray-500">
+                  {payment.cardType[0].toUpperCase() +
+                    payment.cardType.slice(1)}{" "}
+                  Card
+                </div>
               </div>
             </td>
             <td className="px-6 py-4 whitespace-nowrap">

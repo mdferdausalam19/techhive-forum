@@ -727,7 +727,7 @@ async function run() {
 
     // API route to get users (recent, all)
     app.get(
-      "/admin/users/recent",
+      "/admin/users",
       // verifyToken,
       // verifyUserRole("Admin"),
       async (req, res) => {
@@ -751,7 +751,7 @@ async function run() {
 
     // API route to get posts (recent, all)
     app.get(
-      "/admin/posts/recent",
+      "/admin/posts",
       // verifyToken,
       // verifyUserRole("Admin"),
       async (req, res) => {
@@ -775,7 +775,7 @@ async function run() {
 
     // API route to get payments (recent, all)
     app.get(
-      "/admin/payments/recent",
+      "/admin/payments",
       // verifyToken,
       // verifyUserRole("Admin"),
       async (req, res) => {

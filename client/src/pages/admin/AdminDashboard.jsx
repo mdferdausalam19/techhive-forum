@@ -27,7 +27,7 @@ export default function AdminDashboard() {
     queryKey: ["admin-users"],
     queryFn: async () => {
       const { data } = await axiosCommon.get(
-        `/admin/users/recent?limit=${5}&sort=${-1}`
+        `/admin/users?limit=${5}&sort=${-1}`
       );
       return data;
     },
@@ -37,7 +37,7 @@ export default function AdminDashboard() {
     queryKey: ["admin-posts"],
     queryFn: async () => {
       const { data } = await axiosCommon.get(
-        `/admin/posts/recent?limit=${5}&sort=${-1}`
+        `/admin/posts?limit=${5}&sort=${-1}`
       );
       return data;
     },
@@ -47,7 +47,7 @@ export default function AdminDashboard() {
     queryKey: ["admin-payments"],
     queryFn: async () => {
       const { data } = await axiosCommon.get(
-        `/admin/payments/recent?limit=${5}&sort=${-1}`
+        `/admin/payments?limit=${5}&sort=${-1}`
       );
       return data;
     },
