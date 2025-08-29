@@ -15,9 +15,7 @@ export default function UsersPage() {
   const { data: users = [], isLoading: usersLoading } = useQuery({
     queryKey: ["admin-users-all"],
     queryFn: async () => {
-      const { data } = await axiosCommon.get(
-        `/admin/users?limit=${5}&sort=${1}`
-      );
+      const { data } = await axiosCommon.get(`/admin/users`);
       return data;
     },
   });

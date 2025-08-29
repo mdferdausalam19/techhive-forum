@@ -733,13 +733,13 @@ async function run() {
       // verifyUserRole("Admin"),
       async (req, res) => {
         const { limit, sort } = req.query;
-        const limitValue = parseInt(limit) || 5;
-        const sortValue = parseInt(sort) || 1;
+        const limitValue = limit ? parseInt(limit) : 0;
+        const sortValue = sort ? parseInt(sort) : 1;
         try {
           const users = await usersCollection
             .find({})
             .sort({ timestamp: sortValue })
-            .limit(limitValue)
+            .limit(limitValue > 0 ? limitValue : 0)
             .toArray();
 
           res.json(users);
@@ -757,19 +757,20 @@ async function run() {
       // verifyUserRole("Admin"),
       async (req, res) => {
         const { limit, sort } = req.query;
-        const limitValue = parseInt(limit) || 5;
-        const sortValue = parseInt(sort) || 1;
+        const limitValue = limit ? parseInt(limit) : 0;
+        const sortValue = sort ? parseInt(sort) : 1;
+
         try {
           const posts = await postsCollection
             .find({})
             .sort({ date: sortValue })
-            .limit(limitValue)
+            .limit(limitValue > 0 ? limitValue : 0)
             .toArray();
 
           res.json(posts);
         } catch (error) {
-          console.error("Error fetching recent posts:", error);
-          res.status(500).json({ error: "Failed to fetch recent posts" });
+          console.error("Error fetching posts:", error);
+          res.status(500).json({ error: "Failed to fetch posts" });
         }
       }
     );
@@ -781,13 +782,13 @@ async function run() {
       // verifyUserRole("Admin"),
       async (req, res) => {
         const { limit, sort } = req.query;
-        const limitValue = parseInt(limit) || 5;
-        const sortValue = parseInt(sort) || 1;
+        const limitValue = limit ? parseInt(limit) : 0;
+        const sortValue = sort ? parseInt(sort) : 1;
         try {
           const payments = await paymentsCollection
             .find({})
             .sort({ date: sortValue })
-            .limit(limitValue)
+            .limit(limitValue > 0 ? limitValue : 0)
             .toArray();
 
           res.json(payments);

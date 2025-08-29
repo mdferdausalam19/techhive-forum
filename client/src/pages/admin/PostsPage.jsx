@@ -20,9 +20,7 @@ export default function PostsPage() {
   const { data: posts = [], isLoading: postsLoading } = useQuery({
     queryKey: ["admin-posts-all"],
     queryFn: async () => {
-      const { data } = await axiosCommon.get(
-        `/admin/posts?limit=${5}&sort=${1}`
-      );
+      const { data } = await axiosCommon.get(`/admin/posts`);
       return data;
     },
   });

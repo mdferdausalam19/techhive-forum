@@ -14,9 +14,7 @@ export default function PaymentsPage() {
   const { data: payments = [], isLoading: paymentsLoading } = useQuery({
     queryKey: ["admin-payments-all"],
     queryFn: async () => {
-      const { data } = await axiosCommon.get(
-        `/admin/payments?limit=${5}&sort=${1}`
-      );
+      const { data } = await axiosCommon.get(`/admin/payments`);
       return data;
     },
   });
