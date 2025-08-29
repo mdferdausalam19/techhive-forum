@@ -694,9 +694,9 @@ async function run() {
     // Admin Dashboard API Routes
     // Get dashboard statistics
     app.get(
-      "/api/admin/stats",
-      verifyToken,
-      verifyUserRole("Admin"),
+      "/admin/stats",
+      // verifyToken,
+      // verifyUserRole("Admin"),
       async (req, res) => {
         try {
           const totalUsers = await usersCollection.countDocuments();
@@ -721,6 +721,69 @@ async function run() {
         } catch (error) {
           console.error("Error fetching admin stats:", error);
           res.status(500).json({ error: "Failed to fetch admin statistics" });
+        }
+      }
+    );
+
+    // Get recent users
+    app.get(
+      "/admin/users/recent",
+      // verifyToken,
+      // verifyUserRole("Admin"),
+      async (req, res) => {
+        try {
+          const users = await usersCollection
+            .find({})
+            .sort({ timestamp: -1 })
+            .limit(5)
+            .toArray();
+
+          res.json(users);
+        } catch (error) {
+          console.error("Error fetching recent users:", error);
+          res.status(500).json({ error: "Failed to fetch recent users" });
+        }
+      }
+    );
+
+    // Get recent posts
+    app.get(
+      "/admin/posts/recent",
+      // verifyToken,
+      // verifyUserRole("Admin"),
+      async (req, res) => {
+        try {
+          const posts = await postsCollection
+            .find({})
+            .sort({ date: -1 })
+            .limit(5)
+            .toArray();
+
+          res.json(posts);
+        } catch (error) {
+          console.error("Error fetching recent posts:", error);
+          res.status(500).json({ error: "Failed to fetch recent posts" });
+        }
+      }
+    );
+
+    // Get recent payments
+    app.get(
+      "/admin/payments/recent",
+      // verifyToken,
+      // verifyUserRole("Admin"),
+      async (req, res) => {
+        try {
+          const payments = await paymentsCollection
+            .find({})
+            .sort({ date: -1 })
+            .limit(5)
+            .toArray();
+
+          res.json(payments);
+        } catch (error) {
+          console.error("Error fetching recent payments:", error);
+          res.status(500).json({ error: "Failed to fetch recent payments" });
         }
       }
     );

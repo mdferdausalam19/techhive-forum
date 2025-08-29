@@ -74,6 +74,7 @@ export default function MembershipModal({ isOpen, onClose, onConfirm }) {
     try {
       await onConfirm(formData);
       setFormData({
+        cardType: "",
         cardNumber: "",
         cardName: "",
         expiryDate: "",
@@ -108,6 +109,27 @@ export default function MembershipModal({ isOpen, onClose, onConfirm }) {
 
         {/* Payment Form */}
         <form onSubmit={handleSubmit} className="p-6">
+          {/* Card Type */}
+          <div className="mb-4">
+            <label
+              className="block text-gray-700 text-sm font-medium mb-2"
+              htmlFor="cardType"
+            >
+              Card Type
+            </label>
+            <select
+              id="cardType"
+              name="cardType"
+              value={formData.cardType}
+              onChange={handleChange}
+              className="w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+            >
+              <option value="">Select Card Type</option>
+              <option value="credit">Credit Card</option>
+              <option value="debit">Debit Card</option>
+            </select>
+          </div>
+
           {/* Card Number */}
           <div className="mb-4">
             <label

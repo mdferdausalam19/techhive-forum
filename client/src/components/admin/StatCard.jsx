@@ -1,7 +1,7 @@
-export default function StatCard({ label, value, icon: Icon, color }) {
+export default function StatCard({ label, value, icon: Icon, textColor }) {
   return (
     <div
-      className={`rounded-xl shadow-lg p-6 flex flex-col bg-gradient-to-br ${color} text-blue-500 transition-transform hover:scale-[1.02]`}
+      className={`rounded-xl shadow-lg p-6 flex flex-col bg-gradient-to-br from-blue-50 to-blue-100 ${textColor} transition-transform hover:scale-[1.02]`}
     >
       <div className="flex justify-between items-start">
         <div>

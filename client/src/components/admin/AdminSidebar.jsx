@@ -65,7 +65,7 @@ export default function AdminSidebar({ onNavigate }) {
         )}
         <button
           onClick={() => setCollapsed(!collapsed)}
-          className="p-1 rounded-full hover:bg-blue-700 transition-colors"
+          className="p-1 rounded-full hover:bg-blue-700 transition-colors hidden md:block"
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {collapsed ? (

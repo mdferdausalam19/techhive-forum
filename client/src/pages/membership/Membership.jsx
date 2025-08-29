@@ -24,11 +24,21 @@ export default function Membership() {
     setIsLoading(true);
     try {
       const paymentInfo = {
-        uid: user.uid,
+        user: {
+          uid: user.uid,
+          name: user.displayName,
+          email: user.email,
+          avatar: user.photoURL,
+        },
+        plan: "Lifetime Premium",
+        amount: 499,
+        cardType: formData.cardType,
         cardNumber: formData.cardNumber,
         cardName: formData.cardName,
         expiryDate: formData.expiryDate,
         cvv: formData.cvv,
+        date: new Date().toISOString(),
+        transactionId: `txn_${Date.now()}`,
       };
       await axiosSecure.post("/payments", paymentInfo);
       await axiosSecure.patch("/upgrade", { uid: user.uid });

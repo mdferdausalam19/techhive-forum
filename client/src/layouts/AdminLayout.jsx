@@ -11,7 +11,7 @@ export default function AdminLayout() {
       {/* Mobile menu button */}
       <button
         onClick={() => setSidebarOpen(!sidebarOpen)}
-        className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-md bg-blue-600 text-white shadow-lg"
+        className="md:hidden fixed top-2 left-2 z-50 p-2 rounded-md bg-blue-600 text-white shadow-lg"
       >
         <FiMenu className="w-6 h-6" />
       </button>

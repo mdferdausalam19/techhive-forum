@@ -8,100 +8,44 @@ import {
 import StatCard from "../../components/admin/StatCard";
 import AdminTable from "../../components/admin/AdminTable";
 import { format } from "date-fns";
+import { useQuery } from "@tanstack/react-query";
+import useAxiosCommon from "../../hooks/useAxiosCommon";
+import LoadingSpinner from "../../components/shared/LoadingSpinner";
+import { Link } from "react-router";
 
 export default function AdminDashboard() {
-  const stats = {
-    totalPosts: 128,
-    totalComments: 432,
-    totalUsers: 78,
-    generalUsers: 60,
-    premiumUsers: 18,
-    totalLikes: 2100,
-    totalRevenue: 528.93,
-    monthlyGrowth: 12.5,
-  };
+  const axiosCommon = useAxiosCommon();
+  const { data: stats = {}, isLoading: statsLoading } = useQuery({
+    queryKey: ["admin-stats"],
+    queryFn: async () => {
+      const { data } = await axiosCommon.get("/admin/stats");
+      return data;
+    },
+  });
 
-  const users = [
-    {
-      uid: "1",
-      name: "Alice Smith",
-      email: "alice@example.com",
-      role: "Premium",
-      joinDate: "2025-08-20",
+  const { data: users = [], isLoading: usersLoading } = useQuery({
+    queryKey: ["admin-users"],
+    queryFn: async () => {
+      const { data } = await axiosCommon.get("/admin/users/recent");
+      return data;
     },
-    {
-      uid: "2",
-      name: "Bob Johnson",
-      email: "bob@example.com",
-      role: "General",
-      joinDate: "2025-08-21",
-    },
-    {
-      uid: "3",
-      name: "Clara Lee",
-      email: "clara@example.com",
-      role: "Premium",
-      joinDate: "2025-08-22",
-    },
-  ];
+  });
 
-  const posts = [
-    {
-      _id: "p1",
-      title: "Welcome to TechHive!",
-      author: "Alice Smith",
-      category: "General",
-      date: "2025-08-25",
+  const { data: posts = [], isLoading: postsLoading } = useQuery({
+    queryKey: ["admin-posts"],
+    queryFn: async () => {
+      const { data } = await axiosCommon.get("/admin/posts/recent");
+      return data;
     },
-    {
-      _id: "p2",
-      title: "How to use the AI Assistant",
-      author: "Bob Johnson",
-      category: "AI",
-      date: "2025-08-26",
-    },
-    {
-      _id: "p3",
-      title: "Premium Features Overview",
-      author: "Clara Lee",
-      category: "Premium",
-      date: "2025-08-27",
-    },
-  ];
+  });
 
-  const payments = [
-    {
-      id: "PMT-1001",
-      user: { id: "user1", name: "Alice Johnson", email: "alice@example.com" },
-      amount: 9.99,
-      plan: "Monthly Premium",
-      status: "completed",
-      date: new Date("2025-08-27T14:30:00"),
-      method: "Credit Card",
+  const { data: payments = [], isLoading: paymentsLoading } = useQuery({
+    queryKey: ["admin-payments"],
+    queryFn: async () => {
+      const { data } = await axiosCommon.get("/admin/payments/recent");
+      return data;
     },
-    {
-      id: "PMT-1002",
-      user: { id: "user2", name: "Bob Smith", email: "bob@example.com" },
-      amount: 99.99,
-      plan: "Annual Premium",
-      status: "completed",
-      date: new Date("2025-08-26T10:15:00"),
-      method: "PayPal",
-    },
-    {
-      id: "PMT-1003",
-      user: {
-        id: "user3",
-        name: "Charlie Brown",
-        email: "charlie@example.com",
-      },
-      amount: 9.99,
-      plan: "Monthly Premium",
-      status: "pending",
-      date: new Date("2025-08-28T09:45:00"),
-      method: "Credit Card",
-    },
-  ];
+  });
 
   const formatDate = (date) => format(new Date(date), "MMM d, yyyy");
 
@@ -126,6 +70,10 @@ export default function AdminDashboard() {
     );
   };
 
+  if (statsLoading || usersLoading || postsLoading || paymentsLoading) {
+    return <LoadingSpinner />;
+  }
+
   return (
     <div className="space-y-8">
       {/* Stats */}
@@ -134,29 +82,25 @@ export default function AdminDashboard() {
           label="Total Users"
           value={stats.totalUsers}
           icon={FiUsers}
-          color="blue"
-          trend={stats.monthlyGrowth}
+          textColor="text-blue-500"
         />
         <StatCard
           label="Total Posts"
           value={stats.totalPosts}
           icon={FiFileText}
-          color="green"
-          trend={8.2}
+          textColor="text-violet-500"
         />
         <StatCard
           label="Total Comments"
           value={stats.totalComments}
           icon={FiMessageSquare}
-          color="purple"
-          trend={15.3}
+          textColor="text-yellow-500"
         />
         <StatCard
           label="Total Revenue"
           value={stats.totalRevenue}
           icon={FiDollarSign}
-          color="indigo"
-          trend={stats.monthlyGrowth}
+          textColor="text-green-500"
         />
       </div>
 
@@ -164,9 +108,12 @@ export default function AdminDashboard() {
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold text-gray-900">Recent Users</h2>
-          <button className="text-sm font-medium text-blue-600 hover:text-blue-800">
+          <Link
+            to="/admin/users"
+            className="text-sm font-medium text-blue-600 hover:text-blue-800"
+          >
             View All
-          </button>
+          </Link>
         </div>
         <AdminTable
           headers={[
@@ -178,6 +125,7 @@ export default function AdminDashboard() {
           data={users}
           keyField="uid"
           emptyMessage="No users found"
+          showActions={false}
           renderRow={(user) => (
             <>
               <td className="px-6 py-4 whitespace-nowrap">
@@ -205,7 +153,7 @@ export default function AdminDashboard() {
                 </span>
               </td>
               <td className="px-6 py-4 text-sm text-gray-500">
-                {new Date(user.joinDate).toLocaleDateString()}
+                {formatDate(user.timestamp)}
               </td>
             </>
           )}
@@ -216,9 +164,12 @@ export default function AdminDashboard() {
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-lg font-semibold text-gray-900">Recent Posts</h2>
-          <button className="text-sm font-medium text-blue-600 hover:text-blue-800">
+          <Link
+            to="/admin/posts"
+            className="text-sm font-medium text-blue-600 hover:text-blue-800"
+          >
             View All
-          </button>
+          </Link>
         </div>
         <AdminTable
           headers={[
@@ -230,6 +181,7 @@ export default function AdminDashboard() {
           data={posts}
           keyField="_id"
           emptyMessage="No posts found"
+          showActions={false}
           renderRow={(post) => (
             <>
               <td className="px-6 py-4">
@@ -237,7 +189,9 @@ export default function AdminDashboard() {
                   {post.title}
                 </div>
               </td>
-              <td className="px-6 py-4 text-sm text-gray-500">{post.author}</td>
+              <td className="px-6 py-4 text-sm text-gray-500">
+                {post.author.name}
+              </td>
               <td className="px-6 py-4">
                 <span
                   className={`px-2.5 py-1 rounded-full text-xs font-medium ${
@@ -265,9 +219,12 @@ export default function AdminDashboard() {
           <h2 className="text-lg font-semibold text-gray-900">
             Recent Payments
           </h2>
-          <button className="text-sm font-medium text-blue-600 hover:text-blue-800">
+          <Link
+            to="/admin/payments"
+            className="text-sm font-medium text-blue-600 hover:text-blue-800"
+          >
             View All
-          </button>
+          </Link>
         </div>
         <AdminTable
           headers={[
@@ -280,6 +237,7 @@ export default function AdminDashboard() {
           data={payments}
           keyField="id"
           emptyMessage="No payments found"
+          showActions={false}
           renderRow={(payment) => (
             <>
               <td className="px-6 py-4">
