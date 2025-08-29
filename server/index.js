@@ -833,6 +833,52 @@ async function run() {
       }
     });
 
+    // API route to update announcements
+    app.put("/admin/announcements/:id", async (req, res) => {
+      try {
+        const { id } = req.params;
+        const announcement = req.body;
+        const result = await announcementsCollection.updateOne(
+          { _id: new ObjectId(id) },
+          {
+            $set: {
+              title: announcement.title,
+              content: announcement.content,
+              updatedAt: new Date().toISOString(),
+            },
+          }
+        );
+        res.status(200).json({
+          message: "Announcement updated successfully!",
+          announcement: result.modifiedCount,
+        });
+      } catch (err) {
+        console.error("Error updating announcement: ", err.message);
+        res.status(500).json({
+          message: "Failed to update announcement.",
+        });
+      }
+    });
+
+    // API route to delete announcements
+    app.delete("/admin/announcements/:id", async (req, res) => {
+      try {
+        const { id } = req.params;
+        const result = await announcementsCollection.deleteOne({
+          _id: new ObjectId(id),
+        });
+        res.status(200).json({
+          message: "Announcement deleted successfully!",
+          announcement: result.deletedCount,
+        });
+      } catch (err) {
+        console.error("Error deleting announcement: ", err.message);
+        res.status(500).json({
+          message: "Failed to delete announcement.",
+        });
+      }
+    });
+
     // API route for AI assistant
     app.post(
       "/ai/assist",
