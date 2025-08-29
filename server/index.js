@@ -603,6 +603,7 @@ async function run() {
       async (req, res) => {
         try {
           const paymentInfo = req.body;
+          paymentInfo.status = "completed";
           const result = await paymentsCollection.insertOne(paymentInfo);
           res.status(200).json({
             message: "Payment added successfully!",
@@ -686,6 +687,40 @@ async function run() {
             message: "Failed to upgrade user role.",
             error: err.message,
           });
+        }
+      }
+    );
+
+    // Admin Dashboard API Routes
+    // Get dashboard statistics
+    app.get(
+      "/api/admin/stats",
+      verifyToken,
+      verifyUserRole("Admin"),
+      async (req, res) => {
+        try {
+          const totalUsers = await usersCollection.countDocuments();
+          const totalPosts = await postsCollection.countDocuments();
+          const totalComments = await commentsCollection.countDocuments();
+
+          // Calculate total revenue
+          const payments = await paymentsCollection
+            .find({ status: "completed" })
+            .toArray();
+          const totalRevenue = payments.reduce(
+            (sum, payment) => sum + payment.amount,
+            0
+          );
+
+          res.json({
+            totalUsers,
+            totalPosts,
+            totalComments,
+            totalRevenue,
+          });
+        } catch (error) {
+          console.error("Error fetching admin stats:", error);
+          res.status(500).json({ error: "Failed to fetch admin statistics" });
         }
       }
     );
