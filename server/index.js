@@ -692,7 +692,7 @@ async function run() {
     );
 
     // Admin Dashboard API Routes
-    // Get dashboard statistics
+    // API route to get dashboard statistics
     app.get(
       "/admin/stats",
       // verifyToken,
@@ -725,17 +725,20 @@ async function run() {
       }
     );
 
-    // Get recent users
+    // API route to get users (recent, all)
     app.get(
       "/admin/users/recent",
       // verifyToken,
       // verifyUserRole("Admin"),
       async (req, res) => {
+        const { limit, sort } = req.query;
+        const limitValue = parseInt(limit) || 5;
+        const sortValue = parseInt(sort) || 1;
         try {
           const users = await usersCollection
             .find({})
-            .sort({ timestamp: -1 })
-            .limit(5)
+            .sort({ timestamp: sortValue })
+            .limit(limitValue)
             .toArray();
 
           res.json(users);
@@ -746,17 +749,20 @@ async function run() {
       }
     );
 
-    // Get recent posts
+    // API route to get posts (recent, all)
     app.get(
       "/admin/posts/recent",
       // verifyToken,
       // verifyUserRole("Admin"),
       async (req, res) => {
+        const { limit, sort } = req.query;
+        const limitValue = parseInt(limit) || 5;
+        const sortValue = parseInt(sort) || 1;
         try {
           const posts = await postsCollection
             .find({})
-            .sort({ date: -1 })
-            .limit(5)
+            .sort({ date: sortValue })
+            .limit(limitValue)
             .toArray();
 
           res.json(posts);
@@ -767,17 +773,20 @@ async function run() {
       }
     );
 
-    // Get recent payments
+    // API route to get payments (recent, all)
     app.get(
       "/admin/payments/recent",
       // verifyToken,
       // verifyUserRole("Admin"),
       async (req, res) => {
+        const { limit, sort } = req.query;
+        const limitValue = parseInt(limit) || 5;
+        const sortValue = parseInt(sort) || 1;
         try {
           const payments = await paymentsCollection
             .find({})
-            .sort({ date: -1 })
-            .limit(5)
+            .sort({ date: sortValue })
+            .limit(limitValue)
             .toArray();
 
           res.json(payments);
