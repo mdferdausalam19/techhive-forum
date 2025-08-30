@@ -580,7 +580,7 @@ async function run() {
           if (comment) {
             const result = await commentsCollection.updateOne(
               { _id: new ObjectId(id) },
-              { $push: { reports: reportInfo.user_id } }
+              { $set: { report: true } }
             );
           }
           res.status(200).json({
@@ -875,6 +875,59 @@ async function run() {
         console.error("Error deleting announcement: ", err.message);
         res.status(500).json({
           message: "Failed to delete announcement.",
+        });
+      }
+    });
+
+    // API route to get reported comments
+    app.get("/admin/reported-comments", async (req, res) => {
+      try {
+        const reportedComments = await reportsCollection.find({}).toArray();
+
+        res.json(reportedComments);
+      } catch (error) {
+        console.error("Error fetching recent reported comments:", error);
+        res.status(500).json({
+          error: "Failed to fetch recent reported comments",
+        });
+      }
+    });
+
+    // API route to warn a comment
+    app.put("/admin/warn/:id", async (req, res) => {
+      try {
+        const { id } = req.params;
+        const reportInfo = await reportsCollection.findOne({
+          _id: new ObjectId(id),
+        });
+        const comment = await commentsCollection.updateOne(
+          { _id: new ObjectId(reportInfo.commentId) },
+          {
+            $set: {
+              warning: true,
+            },
+          }
+        );
+
+        const report = await reportsCollection.updateOne(
+          { _id: new ObjectId(id) },
+          {
+            $set: {
+              status: "resolved",
+              resolvedAt: new Date().toISOString(),
+            },
+          }
+        );
+
+        res.status(200).json({
+          message: "Comment warned successfully!",
+          comment: comment,
+          report: report,
+        });
+      } catch (err) {
+        console.error("Error warning comment: ", err.message);
+        res.status(500).json({
+          message: "Failed to warn comment.",
         });
       }
     });
