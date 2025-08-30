@@ -20,6 +20,7 @@ import PostsPage from "../pages/admin/PostsPage";
 import ReportedCommentsPage from "../pages/admin/ReportedCommentsPage";
 import AnnouncementsPage from "../pages/admin/AnnouncementsPage";
 import PaymentsPage from "../pages/admin/PaymentsPage";
+import AdminRoute from "./AdminRoute";
 
 export const router = createBrowserRouter([
   {
@@ -101,27 +102,63 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <AdminDashboard />,
+        element: (
+          <PrivateRoute>
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          </PrivateRoute>
+        ),
       },
       {
         path: "users",
-        element: <UsersPage />,
+        element: (
+          <PrivateRoute>
+            <AdminRoute>
+              <UsersPage />
+            </AdminRoute>
+          </PrivateRoute>
+        ),
       },
       {
         path: "posts",
-        element: <PostsPage />,
+        element: (
+          <PrivateRoute>
+            <AdminRoute>
+              <PostsPage />
+            </AdminRoute>
+          </PrivateRoute>
+        ),
       },
       {
         path: "payments",
-        element: <PaymentsPage />,
+        element: (
+          <PrivateRoute>
+            <AdminRoute>
+              <PaymentsPage />
+            </AdminRoute>
+          </PrivateRoute>
+        ),
       },
       {
         path: "reported-comments",
-        element: <ReportedCommentsPage />,
+        element: (
+          <PrivateRoute>
+            <AdminRoute>
+              <ReportedCommentsPage />
+            </AdminRoute>
+          </PrivateRoute>
+        ),
       },
       {
         path: "announcements",
-        element: <AnnouncementsPage />,
+        element: (
+          <PrivateRoute>
+            <AdminRoute>
+              <AnnouncementsPage />
+            </AdminRoute>
+          </PrivateRoute>
+        ),
       },
     ],
   },

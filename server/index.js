@@ -141,24 +141,6 @@ async function run() {
       }
     });
 
-    //  API route to get all users
-    app.get(
-      "/users",
-      verifyToken,
-      verifyUserRole("Admin"),
-      async (req, res) => {
-        try {
-          const users = await usersCollection.find().toArray();
-          res.status(200).json(users);
-        } catch (err) {
-          console.error("Error fetching users: ", err.message);
-          res.status(500).json({
-            message: "Failed to fetch users.",
-          });
-        }
-      }
-    );
-
     // API route to get user by uid
     app.get("/users/:uid", verifyToken, async (req, res) => {
       try {

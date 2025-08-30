@@ -9,6 +9,7 @@ import {
   FaPlus,
   FaFileAlt,
 } from "react-icons/fa";
+import { MdDashboard } from "react-icons/md";
 import useRole from "../../hooks/useRole";
 
 export default function Navbar() {
@@ -230,6 +231,16 @@ export default function Navbar() {
                   </div>
 
                   {/* Menu Items */}
+                  {role === "Admin" && (
+                    <Link
+                      to="/admin"
+                      className="flex items-center px-4 py-3 text-sm text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 border-l-2 border-transparent hover:border-blue-500"
+                      onClick={() => setProfileDropdownOpen(false)}
+                    >
+                      <MdDashboard className="w-4 h-4 mr-3 text-gray-400" />
+                      Dashboard
+                    </Link>
+                  )}
                   {profileMenuItems.map((item, index) => {
                     const IconComponent = item.icon;
                     return (
@@ -372,6 +383,16 @@ export default function Navbar() {
                       : "opacity-0 invisible max-h-0 -translate-y-2"
                   } overflow-hidden`}
                 >
+                  {role === "Admin" && (
+                    <Link
+                      to="/admin"
+                      className="flex items-center px-4 py-3 text-sm text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 border-l-2 border-transparent hover:border-blue-500"
+                      onClick={() => setProfileDropdownOpen(false)}
+                    >
+                      <MdDashboard className="w-4 h-4 mr-3 text-gray-400" />
+                      Dashboard
+                    </Link>
+                  )}
                   {profileMenuItems.map((item, index) => {
                     const IconComponent = item.icon;
                     return (
