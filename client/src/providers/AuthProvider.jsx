@@ -20,20 +20,31 @@ const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   // create a user
-  const createUser = (email, password) => {
+  const createUser = async (email, password) => {
     setLoading(true);
-    return createUserWithEmailAndPassword(auth, email, password);
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    return userCredential;
   };
 
   // sign in a user
-  const signInUser = (email, password) => {
+  const signInUser = async (email, password) => {
     setLoading(true);
-    return signInWithEmailAndPassword(auth, email, password);
+    const userCredential = await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    return userCredential;
   };
 
   // sign in with google
-  const googleSignIn = () => {
-    return signInWithPopup(auth, googleProvider);
+  const googleSignIn = async () => {
+    const result = await signInWithPopup(auth, googleProvider);
+    return result;
   };
 
   // update a user's profile
@@ -90,10 +101,16 @@ const AuthProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
-        getToken(currentUser?.uid);
-        saveUser(currentUser);
+        try {
+          await saveUser(currentUser);
+          await getToken(currentUser.uid);
+        } catch (error) {
+          console.error("Error in auth state change:", error);
+          await signOutUser();
+          return;
+        }
       }
       setUser(currentUser || null);
       setLoading(false);

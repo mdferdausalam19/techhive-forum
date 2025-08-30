@@ -4,6 +4,8 @@ import { useForm } from "react-hook-form";
 import { FaEye, FaEyeSlash, FaRobot } from "react-icons/fa";
 import { TbFidgetSpinner } from "react-icons/tb";
 import toast from "react-hot-toast";
+import { signOut } from "firebase/auth";
+import auth from "../../firebase/firebase.config";
 import SocialSignIn from "../../components/auth/SocialSignIn";
 import useAuth from "../../hooks/useAuth";
 import useAxiosCommon from "../../hooks/useAxiosCommon";
@@ -53,12 +55,18 @@ export default function SignUp() {
         role: "General",
         badge: "Bronze",
       });
+      await user.reload();
       navigate("/");
       toast.success("Sign up successful!");
       reset();
     } catch (err) {
+      console.error("Sign up error:", err);
+      if (auth.currentUser) {
+        await signOut(auth);
+      }
+      toast.error(err.message || "Failed to create account. Please try again.");
+    } finally {
       setLoading(false);
-      toast.error(err.message);
     }
   };
 

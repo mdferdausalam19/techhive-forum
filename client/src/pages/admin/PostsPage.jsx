@@ -11,6 +11,7 @@ import useAxiosCommon from "../../hooks/useAxiosCommon";
 import { useQuery } from "@tanstack/react-query";
 import LoadingSpinner from "../../components/shared/LoadingSpinner";
 import { format } from "date-fns";
+import { Link } from "react-router";
 
 export default function PostsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -31,18 +32,6 @@ export default function PostsPage() {
       .includes(searchQuery.toLowerCase());
     return matchesSearch;
   });
-
-  const handleView = (post) => {
-    // Handle view post
-    console.log("View post:", post);
-  };
-
-  const handleDelete = (post) => {
-    // Handle delete post
-    if (window.confirm(`Are you sure you want to delete "${post.title}"?`)) {
-      console.log("Delete post:", post);
-    }
-  };
 
   const formatDate = (date) => format(new Date(date), "MMM d, yyyy");
 
@@ -83,12 +72,12 @@ export default function PostsPage() {
           { key: "author", label: "Author" },
           { key: "category", label: "Category" },
           { key: "stats", label: "Statistics" },
+          { key: "actions", label: "Actions" },
         ]}
         data={filteredPosts}
         keyField="id"
+        showActions={false}
         emptyMessage="No posts found matching your criteria"
-        onView={handleView}
-        onDelete={handleDelete}
         renderRow={(post) => (
           <>
             <td className="px-6 py-4">
@@ -124,6 +113,16 @@ export default function PostsPage() {
                   <FiThumbsUp className="mr-1" />
                   {post.likes.length}
                 </div>
+              </div>
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap">
+              <div className="flex items-center space-x-4">
+                <Link
+                  to={`/post/${post._id}`}
+                  className="text-blue-600 hover:text-blue-900"
+                >
+                  View
+                </Link>
               </div>
             </td>
           </>

@@ -34,8 +34,8 @@ export default function AdminLayout() {
       )}
 
       {/* Main content */}
-      <main className="flex-1 md:ml-64 min-h-screen transition-all duration-300 p-4 md:p-8 overflow-y-auto">
-        <div className="bg-white rounded-xl shadow-lg p-6 h-full">
+      <main className="flex-1 md:ml-20 min-h-screen transition-all duration-300 p-4 md:p-8 overflow-y-auto">
+        <div className="bg-white rounded-xl shadow-lg h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <Outlet />
         </div>
       </main>

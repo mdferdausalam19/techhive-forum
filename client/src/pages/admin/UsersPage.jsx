@@ -27,13 +27,6 @@ export default function UsersPage() {
     return matchesSearch;
   });
 
-  const handleDelete = (user) => {
-    // Handle delete user
-    if (window.confirm(`Are you sure you want to delete ${user.name}?`)) {
-      console.log("Delete user:", user);
-    }
-  };
-
   const formatDate = (date) => format(new Date(date), "MMM d, yyyy");
 
   if (usersLoading) {
@@ -77,8 +70,8 @@ export default function UsersPage() {
         ]}
         data={filteredUsers}
         keyField="id"
+        showActions={false}
         emptyMessage="No users found matching your criteria"
-        onDelete={handleDelete}
         renderRow={(user) => (
           <>
             <td className="px-6 py-4 whitespace-nowrap">
