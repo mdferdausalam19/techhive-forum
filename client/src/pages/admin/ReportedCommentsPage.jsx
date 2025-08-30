@@ -11,92 +11,63 @@ import {
   FiMessageSquare,
   FiUserX,
 } from "react-icons/fi";
+import { useQuery } from "@tanstack/react-query";
+import useAxiosCommon from "../../hooks/useAxiosCommon";
+import { toast } from "react-hot-toast";
+import LoadingSpinner from "../../components/shared/LoadingSpinner";
+import { IoWarningOutline } from "react-icons/io5";
+import WarningModal from "../../components/admin/WarningModal";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function ReportedCommentsPage() {
+  const axiosCommon = useAxiosCommon();
+  const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [warningModalOpen, setWarningModalOpen] = useState(false);
+  const [selectedComment, setSelectedComment] = useState(null);
 
-  const reportedComments = [
-    {
-      id: 1,
-      content:
-        "This is an inappropriate comment that violates our community guidelines...",
-      author: "User123",
-      postTitle: "Getting Started with React Hooks",
-      reportReason: "Hate speech",
-      reportCount: 5,
-      status: "pending",
-      reportedAt: "2025-08-26T14:30:00",
-    },
-    {
-      id: 2,
-      content: "Spam message with promotional content...",
-      author: "SpamBot",
-      postTitle: "State Management in 2025",
-      reportReason: "Spam",
-      reportCount: 3,
-      status: "pending",
-      reportedAt: "2025-08-27T09:15:00",
-    },
-    {
-      id: 3,
-      content: "This comment was already reviewed and approved...",
-      author: "HelpfulUser",
-      postTitle: "TypeScript Best Practices",
-      reportReason: "Other",
-      reportCount: 1,
-      status: "resolved",
-      resolvedBy: "Admin",
-      resolvedAt: "2025-08-25T16:45:00",
-      resolution: "approved",
-    },
-  ];
+  const { data: reportedComments = [], isLoading: reportedCommentsLoading } =
+    useQuery({
+      queryKey: ["reported-comments"],
+      queryFn: async () => {
+        const { data } = await axiosCommon.get("/admin/reported-comments");
+        return data;
+      },
+    });
+
+  const handleSendWarning = async () => {
+    try {
+      await axiosCommon.put(`/admin/warn/${selectedComment._id}`);
+      await queryClient.invalidateQueries(["reported-comments"]);
+      toast.success("Warning sent successfully");
+    } catch (error) {
+      console.error("Failed to send warning:", error);
+      toast.error("Failed to send warning. Please try again.");
+    } finally {
+      setWarningModalOpen(false);
+    }
+  };
+
+  const handleWarnClick = (comment) => {
+    setSelectedComment(comment);
+    setWarningModalOpen(true);
+  };
 
   const filteredComments = reportedComments.filter((comment) => {
     const matchesSearch =
-      comment.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      comment.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      comment.author.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       comment.postTitle.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesFilter =
       statusFilter === "all" || comment.status === statusFilter;
     return matchesSearch && matchesFilter;
   });
 
-  const handleView = (comment) => {
-    // Handle view comment in context
-    console.log("View comment:", comment);
-  };
-
-  const handleApprove = (comment) => {
-    // Handle approve comment
-    if (window.confirm("Approve this comment and dismiss all reports?")) {
-      console.log("Approve comment:", comment.id);
-    }
-  };
-
-  const handleRemove = (comment) => {
-    // Handle remove comment
-    if (window.confirm("Remove this comment and notify the author?")) {
-      console.log("Remove comment:", comment.id);
-    }
-  };
-
-  const handleBanUser = (comment) => {
-    // Handle ban user
-    if (
-      window.confirm(
-        `Ban user ${comment.author}? This will prevent them from posting.`
-      )
-    ) {
-      console.log("Ban user:", comment.author);
-    }
-  };
-
   const getStatusBadge = (comment) => {
     if (comment.status === "resolved") {
       return (
         <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-          Resolved ({comment.resolution})
+          Resolved
         </span>
       );
     }
@@ -107,6 +78,9 @@ export default function ReportedCommentsPage() {
     );
   };
 
+  if (reportedCommentsLoading) {
+    return <LoadingSpinner />;
+  }
   return (
     <div className="space-y-6">
       <AdminPageHeader
@@ -164,31 +138,27 @@ export default function ReportedCommentsPage() {
                 On: <span className="text-blue-600">{comment.postTitle}</span>
               </div>
               <div className="text-sm text-gray-500 line-clamp-2">
-                {comment.content}
+                {comment.postExcerpt}
               </div>
               <div className="mt-2 flex items-center text-xs text-gray-500">
                 <FiMessageSquare className="mr-1" />
                 Reported for:{" "}
-                <span className="font-medium ml-1">{comment.reportReason}</span>
-                <span className="mx-2">•</span>
-                <span>
-                  Reported {comment.reportCount}{" "}
-                  {comment.reportCount === 1 ? "time" : "times"}
-                </span>
+                <span className="font-medium ml-1">{comment.reason}</span>
               </div>
             </td>
             <td className="px-6 py-4 whitespace-nowrap">
               <div className="text-sm text-gray-900">
-                <span className="font-medium">Author:</span> {comment.author}
+                <span className="font-medium">Author:</span>{" "}
+                {comment.author.name}
               </div>
               <div className="text-sm text-gray-500">
                 <span className="font-medium">Reported:</span>{" "}
-                {new Date(comment.reportedAt).toLocaleString()}
+                {new Date(comment.reportDate).toLocaleString()}
               </div>
               {comment.resolvedAt && (
                 <div className="text-sm text-gray-500">
-                  <span className="font-medium">Resolved by:</span>{" "}
-                  {comment.resolvedBy}
+                  <span className="font-medium">Resolved:</span>{" "}
+                  {new Date(comment.resolvedAt).toLocaleString()}
                 </div>
               )}
             </td>
@@ -198,38 +168,26 @@ export default function ReportedCommentsPage() {
             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
               <div className="flex flex-col space-y-2">
                 <button
-                  onClick={() => handleView(comment)}
-                  className="text-blue-600 hover:text-blue-900 flex items-center"
+                  onClick={() => handleWarnClick(comment)}
+                  className="text-yellow-500 hover:text-yellow-600 flex items-center gap-1 cursor-pointer"
                 >
-                  <FiEye className="mr-1 h-4 w-4" /> View in Context
+                  <IoWarningOutline className="text-lg" /> <span>Warn</span>
                 </button>
-                {comment.status === "pending" && (
-                  <>
-                    <button
-                      onClick={() => handleApprove(comment)}
-                      className="text-green-600 hover:text-green-900 flex items-center"
-                    >
-                      <FiCheck className="mr-1 h-4 w-4" /> Approve
-                    </button>
-                    <button
-                      onClick={() => handleRemove(comment)}
-                      className="text-red-600 hover:text-red-900 flex items-center"
-                    >
-                      <FiX className="mr-1 h-4 w-4" /> Remove
-                    </button>
-                    <button
-                      onClick={() => handleBanUser(comment)}
-                      className="text-red-600 hover:text-red-900 flex items-center text-xs"
-                    >
-                      <FiUserX className="mr-1 h-4 w-4" /> Ban User
-                    </button>
-                  </>
-                )}
               </div>
             </td>
           </>
         )}
       />
+
+      {/* Warning Modal */}
+      {warningModalOpen && selectedComment && (
+        <WarningModal
+          isOpen={warningModalOpen}
+          onClose={() => setWarningModalOpen(false)}
+          user={selectedComment.author}
+          onSendWarning={handleSendWarning}
+        />
+      )}
     </div>
   );
 }

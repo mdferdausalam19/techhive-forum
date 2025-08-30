@@ -55,6 +55,8 @@ export default function CommentSection({ post }) {
       parent_id: null,
       reply_to_author: null,
       timestamp: Date.now(),
+      warning: false,
+      report: false,
     };
     try {
       await commentMutateAsync(commentInfo);
@@ -101,6 +103,8 @@ export default function CommentSection({ post }) {
         avatar: replyingToComment?.author?.avatar,
       },
       timestamp: Date.now(),
+      warning: false,
+      report: false,
     };
     try {
       await commentMutateAsync(commentInfo);
@@ -122,6 +126,7 @@ export default function CommentSection({ post }) {
         ),
       onSuccess: () => {
         toast.success("Comment reported successfully!");
+        queryClient.invalidateQueries({ queryKey: ["comments", post._id] });
         setShowReport(false);
       },
       onError: () => {
@@ -131,9 +136,20 @@ export default function CommentSection({ post }) {
 
   const handleReportSubmit = async (commentId, reason, details) => {
     const reportInfo = {
+      author: {
+        id: user?.uid,
+        name: user?.displayName,
+        avatar: user?.photoURL,
+      },
+      post_id: post._id,
+      postTitle: post.title,
+      postExcerpt: post.excerpt,
       commentId,
       reason,
       details,
+      reportDate: new Date().toISOString(),
+      status: "pending",
+      resolvedAt: null,
     };
     if (!reason || !details) return;
     try {

@@ -1,3 +1,6 @@
+import { MdOutlineReport } from "react-icons/md";
+import { IoWarningOutline } from "react-icons/io5";
+
 export default function CommentItem({ comment, onReport, onReply }) {
   const formatTimestamp = (timestamp) => {
     const date = new Date(timestamp);
@@ -11,22 +14,32 @@ export default function CommentItem({ comment, onReport, onReply }) {
           : "bg-white border-l-4 border-blue-100"
       }`}
     >
-      <div className="flex items-center gap-4 mb-2">
-        <img
-          src={
-            comment.author?.avatar ||
-            "https://i.ibb.co/9H2PJ7h2/d43801412989.jpg"
-          }
-          alt="avatar"
-          className="w-10 h-10 rounded-full border-2 border-blue-200 shadow-sm"
-        />
-        <div className="flex flex-col">
-          <span className="font-semibold text-blue-700 text-base">
-            {comment.author?.name}
-          </span>
-          <span className="text-xs text-gray-400 mt-0.5">
-            {formatTimestamp(comment.timestamp)}
-          </span>
+      <div className="flex items-center justify-between gap-4 mb-2">
+        <div className="flex items-center gap-2">
+          <img
+            src={
+              comment.author?.avatar ||
+              "https://i.ibb.co/9H2PJ7h2/d43801412989.jpg"
+            }
+            alt="avatar"
+            className="w-10 h-10 rounded-full border-2 border-blue-200 shadow-sm"
+          />
+          <div className="flex flex-col">
+            <span className="font-semibold text-blue-700 text-base">
+              {comment.author?.name}
+            </span>
+            <span className="text-xs text-gray-400 mt-0.5">
+              {formatTimestamp(comment.timestamp)}
+            </span>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          {comment.report && (
+            <MdOutlineReport className="text-red-500 text-2xl" />
+          )}
+          {comment.warning && (
+            <IoWarningOutline className="text-yellow-500 text-2xl" />
+          )}
         </div>
       </div>
       {comment.reply_to_author && (
