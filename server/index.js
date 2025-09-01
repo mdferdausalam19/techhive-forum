@@ -304,7 +304,7 @@ async function run() {
     app.get(
       "/posts/:id",
       verifyToken,
-      verifyUserRole("General", "Premium"),
+      verifyUserRole("General", "Premium", "Admin"),
       async (req, res) => {
         try {
           const { id } = req.params;
@@ -375,7 +375,7 @@ async function run() {
     app.delete(
       "/posts/:id",
       verifyToken,
-      verifyUserRole("General", "Premium"),
+      verifyUserRole("General", "Premium", "Admin"),
       async (req, res) => {
         try {
           const { id } = req.params;
@@ -498,7 +498,7 @@ async function run() {
     app.get(
       "/posts/:id/comments",
       verifyToken,
-      verifyUserRole("General", "Premium"),
+      verifyUserRole("General", "Premium", "Admin"),
       async (req, res) => {
         try {
           const { id } = req.params;

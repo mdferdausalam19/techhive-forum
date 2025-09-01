@@ -8,15 +8,24 @@ import {
   FiThumbsUp,
 } from "react-icons/fi";
 import useAxiosCommon from "../../hooks/useAxiosCommon";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import LoadingSpinner from "../../components/shared/LoadingSpinner";
 import { format } from "date-fns";
 import { Link } from "react-router";
+import toast from "react-hot-toast";
+import DeletePostModal from "../../components/post/DeletePostModal";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function PostsPage() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletingPost, setDeletingPost] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const axiosCommon = useAxiosCommon();
+  const axiosSecure = useAxiosSecure();
+  const queryClient = useQueryClient();
 
   const { data: posts = [], isLoading: postsLoading } = useQuery({
     queryKey: ["admin-posts-all"],
@@ -25,6 +34,38 @@ export default function PostsPage() {
       return data;
     },
   });
+
+  const { mutateAsync: deletePost, isLoading: deletePostLoading } = useMutation(
+    {
+      mutationFn: async (postId) => {
+        await axiosSecure.delete(`/posts/${postId}`);
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["admin-posts-all"] });
+        setShowDeleteModal(false);
+        setIsDeleting(false);
+        setDeletingPost(null);
+        toast.success("Post deleted successfully!");
+      },
+      onError: () => {
+        toast.error("Failed to delete post. Please try again.");
+      },
+    }
+  );
+
+  const confirmDeletePost = async () => {
+    setIsDeleting(true);
+    try {
+      await deletePost(deletingPost._id);
+    } catch (err) {
+      console.error("Error deleting post: ", err.message);
+    }
+  };
+
+  const handleDelete = async (post) => {
+    setDeletingPost(post);
+    setShowDeleteModal(true);
+  };
 
   const filteredPosts = posts.filter((post) => {
     const matchesSearch = post.title
@@ -35,7 +76,7 @@ export default function PostsPage() {
 
   const formatDate = (date) => format(new Date(date), "MMM d, yyyy");
 
-  if (postsLoading) {
+  if (postsLoading || deletePostLoading) {
     return <LoadingSpinner />;
   }
 
@@ -123,10 +164,28 @@ export default function PostsPage() {
                 >
                   View
                 </Link>
+                <button
+                  onClick={() => handleDelete(post)}
+                  className="text-red-600 hover:text-red-900"
+                >
+                  Delete
+                </button>
               </div>
             </td>
           </>
         )}
+      />
+
+      {/* Delete Post Modal */}
+      <DeletePostModal
+        isOpen={showDeleteModal}
+        onClose={() => {
+          setShowDeleteModal(false);
+          setDeletingPost(null);
+        }}
+        onConfirm={confirmDeletePost}
+        postTitle={deletingPost?.title}
+        isLoading={isDeleting}
       />
     </div>
   );

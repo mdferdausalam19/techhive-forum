@@ -21,8 +21,8 @@ export default function PaymentsPage() {
 
   const filteredPayments = payments.filter((payment) => {
     const matchesSearch =
-      payment.user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      payment.user.email.toLowerCase().includes(searchQuery.toLowerCase());
+      payment?.user?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      payment?.user?.email?.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesSearch;
   });
 
@@ -138,9 +138,7 @@ export default function PaymentsPage() {
                   {payment.cardName}
                 </div>
                 <div className="text-sm text-gray-500">
-                  {payment.cardType[0].toUpperCase() +
-                    payment.cardType.slice(1)}{" "}
-                  Card
+                  {payment.cardType} card
                 </div>
               </div>
             </td>
