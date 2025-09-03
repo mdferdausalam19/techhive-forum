@@ -7,7 +7,6 @@ import {
   FiMessageSquare,
   FiThumbsUp,
 } from "react-icons/fi";
-import useAxiosCommon from "../../hooks/useAxiosCommon";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import LoadingSpinner from "../../components/shared/LoadingSpinner";
 import { format } from "date-fns";
@@ -23,14 +22,13 @@ export default function PostsPage() {
   const [deletingPost, setDeletingPost] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  const axiosCommon = useAxiosCommon();
   const axiosSecure = useAxiosSecure();
   const queryClient = useQueryClient();
 
   const { data: posts = [], isLoading: postsLoading } = useQuery({
     queryKey: ["admin-posts-all"],
     queryFn: async () => {
-      const { data } = await axiosCommon.get(`/admin/posts`);
+      const { data } = await axiosSecure.get(`/admin/posts`);
       return data;
     },
   });

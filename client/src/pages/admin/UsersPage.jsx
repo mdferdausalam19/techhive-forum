@@ -2,20 +2,20 @@ import React, { useState } from "react";
 import AdminPageHeader from "../../components/admin/AdminPageHeader";
 import AdminTable from "../../components/admin/AdminTable";
 import { FiUsers, FiSearch } from "react-icons/fi";
-import useAxiosCommon from "../../hooks/useAxiosCommon";
 import { useQuery } from "@tanstack/react-query";
 import LoadingSpinner from "../../components/shared/LoadingSpinner";
 import { format } from "date-fns";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 
 export default function UsersPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
-  const axiosCommon = useAxiosCommon();
+  const axiosSecure = useAxiosSecure();
 
   const { data: users = [], isLoading: usersLoading } = useQuery({
     queryKey: ["admin-users-all"],
     queryFn: async () => {
-      const { data } = await axiosCommon.get(`/admin/users`);
+      const { data } = await axiosSecure.get(`/admin/users`);
       return data;
     },
   });

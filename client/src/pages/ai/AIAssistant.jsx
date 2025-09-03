@@ -105,10 +105,11 @@ export default function AIAssistant() {
               ))}
               {isTyping && (
                 <AIMessage
+                  isTyping={isTyping}
                   message={{
                     type: "ai",
-                    content: "...",
-                    timestamp: "Just now",
+                    content: "",
+                    timestamp: "",
                   }}
                 />
               )}

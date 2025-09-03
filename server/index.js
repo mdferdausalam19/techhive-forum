@@ -601,24 +601,6 @@ async function run() {
       }
     );
 
-    // API route to get payments
-    app.get(
-      "/payments",
-      verifyToken,
-      verifyUserRole("Admin"),
-      async (req, res) => {
-        try {
-          const payments = await paymentsCollection.find().toArray();
-          res.status(200).json(payments);
-        } catch (err) {
-          console.error("Error fetching payments: ", err.message);
-          res.status(500).json({
-            message: "Failed to fetch payments.",
-          });
-        }
-      }
-    );
-
     // API route to upgrade user role and badge
     app.patch(
       "/upgrade",
@@ -678,8 +660,8 @@ async function run() {
     // API route to get dashboard statistics
     app.get(
       "/admin/stats",
-      // verifyToken,
-      // verifyUserRole("Admin"),
+      verifyToken,
+      verifyUserRole("Admin"),
       async (req, res) => {
         try {
           const totalUsers = await usersCollection.countDocuments();
@@ -711,8 +693,8 @@ async function run() {
     // API route to get users
     app.get(
       "/admin/users",
-      // verifyToken,
-      // verifyUserRole("Admin"),
+      verifyToken,
+      verifyUserRole("Admin"),
       async (req, res) => {
         const { limit, sort } = req.query;
         const limitValue = limit ? parseInt(limit) : 0;
@@ -735,8 +717,8 @@ async function run() {
     // API route to get posts
     app.get(
       "/admin/posts",
-      // verifyToken,
-      // verifyUserRole("Admin"),
+      verifyToken,
+      verifyUserRole("Admin"),
       async (req, res) => {
         const { limit, sort } = req.query;
         const limitValue = limit ? parseInt(limit) : 0;
@@ -760,8 +742,8 @@ async function run() {
     // API route to get payments
     app.get(
       "/admin/payments",
-      // verifyToken,
-      // verifyUserRole("Admin"),
+      verifyToken,
+      verifyUserRole("Admin"),
       async (req, res) => {
         const { limit, sort } = req.query;
         const limitValue = limit ? parseInt(limit) : 0;
@@ -784,8 +766,8 @@ async function run() {
     // API route to add announcement
     app.post(
       "/admin/announcements",
-      // verifyToken,
-      // verifyUserRole("Admin"),
+      verifyToken,
+      verifyUserRole("Admin"),
       async (req, res) => {
         try {
           const announcement = req.body;
@@ -807,7 +789,6 @@ async function run() {
     app.get("/announcements", async (req, res) => {
       try {
         const announcements = await announcementsCollection.find({}).toArray();
-
         res.json(announcements);
       } catch (error) {
         console.error("Error fetching recent announcements:", error);
@@ -816,103 +797,123 @@ async function run() {
     });
 
     // API route to update announcements
-    app.put("/admin/announcements/:id", async (req, res) => {
-      try {
-        const { id } = req.params;
-        const announcement = req.body;
-        const result = await announcementsCollection.updateOne(
-          { _id: new ObjectId(id) },
-          {
-            $set: {
-              title: announcement.title,
-              content: announcement.content,
-              updatedAt: new Date().toISOString(),
-            },
-          }
-        );
-        res.status(200).json({
-          message: "Announcement updated successfully!",
-          announcement: result.modifiedCount,
-        });
-      } catch (err) {
-        console.error("Error updating announcement: ", err.message);
-        res.status(500).json({
-          message: "Failed to update announcement.",
-        });
+    app.put(
+      "/admin/announcements/:id",
+      verifyToken,
+      verifyUserRole("Admin"),
+      async (req, res) => {
+        try {
+          const { id } = req.params;
+          const announcement = req.body;
+          const result = await announcementsCollection.updateOne(
+            { _id: new ObjectId(id) },
+            {
+              $set: {
+                title: announcement.title,
+                content: announcement.content,
+                updatedAt: new Date().toISOString(),
+              },
+            }
+          );
+          res.status(200).json({
+            message: "Announcement updated successfully!",
+            announcement: result.modifiedCount,
+          });
+        } catch (err) {
+          console.error("Error updating announcement: ", err.message);
+          res.status(500).json({
+            message: "Failed to update announcement.",
+          });
+        }
       }
-    });
+    );
 
     // API route to delete announcements
-    app.delete("/admin/announcements/:id", async (req, res) => {
-      try {
-        const { id } = req.params;
-        const result = await announcementsCollection.deleteOne({
-          _id: new ObjectId(id),
-        });
-        res.status(200).json({
-          message: "Announcement deleted successfully!",
-          announcement: result.deletedCount,
-        });
-      } catch (err) {
-        console.error("Error deleting announcement: ", err.message);
-        res.status(500).json({
-          message: "Failed to delete announcement.",
-        });
+    app.delete(
+      "/admin/announcements/:id",
+      verifyToken,
+      verifyUserRole("Admin"),
+      async (req, res) => {
+        try {
+          const { id } = req.params;
+          const result = await announcementsCollection.deleteOne({
+            _id: new ObjectId(id),
+          });
+          res.status(200).json({
+            message: "Announcement deleted successfully!",
+            announcement: result.deletedCount,
+          });
+        } catch (err) {
+          console.error("Error deleting announcement: ", err.message);
+          res.status(500).json({
+            message: "Failed to delete announcement.",
+          });
+        }
       }
-    });
+    );
 
     // API route to get reported comments
-    app.get("/admin/reported-comments", async (req, res) => {
-      try {
-        const reportedComments = await reportsCollection.find({}).toArray();
+    app.get(
+      "/admin/reported-comments",
+      verifyToken,
+      verifyUserRole("Admin"),
+      async (req, res) => {
+        try {
+          const reportedComments = await reportsCollection.find({}).toArray();
 
-        res.json(reportedComments);
-      } catch (error) {
-        console.error("Error fetching recent reported comments:", error);
-        res.status(500).json({
-          error: "Failed to fetch recent reported comments",
-        });
+          res.json(reportedComments);
+        } catch (error) {
+          console.error("Error fetching recent reported comments:", error);
+          res.status(500).json({
+            error: "Failed to fetch recent reported comments",
+          });
+        }
       }
-    });
+    );
 
     // API route to warn a comment
-    app.put("/admin/warn/:id", async (req, res) => {
-      try {
-        const { id } = req.params;
-        const reportInfo = await reportsCollection.findOne({
-          _id: new ObjectId(id),
-        });
-        const comment = await commentsCollection.updateOne(
-          { _id: new ObjectId(reportInfo.commentId) },
-          {
-            $set: {
-              warning: true,
-            },
-          }
-        );
+    app.put(
+      "/admin/warn/:id",
+      verifyToken,
+      verifyUserRole("Admin"),
+      async (req, res) => {
+        try {
+          const { id } = req.params;
+          const reportInfo = await reportsCollection.findOne({
+            _id: new ObjectId(id),
+          });
+          const comment = await commentsCollection.updateOne(
+            { _id: new ObjectId(reportInfo.commentId) },
+            {
+              $set: {
+                warning: true,
+              },
+            }
+          );
 
-        const report = await reportsCollection.updateOne(
-          { _id: new ObjectId(id) },
-          {
-            $set: {
-              status: "resolved",
-              resolvedAt: new Date().toISOString(),
-            },
-          }
-        );
+          const report = await reportsCollection.updateOne(
+            { _id: new ObjectId(id) },
+            {
+              $set: {
+                status: "resolved",
+                resolvedAt: new Date().toISOString(),
+              },
+            }
+          );
 
-        res.status(200).json({
-          message: "Comment warned successfully!",
-          comment: comment,
-          report: report,
-        });
-      } catch (err) {
-        console.error("Error warning comment: ", err.message);
-        res.status(500).json({
-          message: "Failed to warn comment.",
-        });
+          res.status(200).json({
+            message: "Comment warned successfully!",
+            comment: comment,
+            report: report,
+          });
+        } catch (err) {
+          console.error("Error warning comment: ", err.message);
+          res.status(500).json({
+            message: "Failed to warn comment.",
+          });
+        }
       }
-    });
+    );
 
     // API route for AI assistant
     app.post(

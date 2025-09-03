@@ -9,16 +9,16 @@ import StatCard from "../../components/admin/StatCard";
 import AdminTable from "../../components/admin/AdminTable";
 import { format } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
-import useAxiosCommon from "../../hooks/useAxiosCommon";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 import LoadingSpinner from "../../components/shared/LoadingSpinner";
 import { Link } from "react-router";
 
 export default function AdminDashboard() {
-  const axiosCommon = useAxiosCommon();
+  const axiosSecure = useAxiosSecure();
   const { data: stats = {}, isLoading: statsLoading } = useQuery({
     queryKey: ["admin-stats"],
     queryFn: async () => {
-      const { data } = await axiosCommon.get("/admin/stats");
+      const { data } = await axiosSecure.get("/admin/stats");
       return data;
     },
   });
@@ -26,7 +26,7 @@ export default function AdminDashboard() {
   const { data: users = [], isLoading: usersLoading } = useQuery({
     queryKey: ["admin-users"],
     queryFn: async () => {
-      const { data } = await axiosCommon.get(
+      const { data } = await axiosSecure.get(
         `/admin/users?limit=${5}&sort=${-1}`
       );
       return data;
@@ -36,7 +36,7 @@ export default function AdminDashboard() {
   const { data: posts = [], isLoading: postsLoading } = useQuery({
     queryKey: ["admin-posts"],
     queryFn: async () => {
-      const { data } = await axiosCommon.get(
+      const { data } = await axiosSecure.get(
         `/admin/posts?limit=${5}&sort=${-1}`
       );
       return data;
@@ -46,7 +46,7 @@ export default function AdminDashboard() {
   const { data: payments = [], isLoading: paymentsLoading } = useQuery({
     queryKey: ["admin-payments"],
     queryFn: async () => {
-      const { data } = await axiosCommon.get(
+      const { data } = await axiosSecure.get(
         `/admin/payments?limit=${5}&sort=${-1}`
       );
       return data;

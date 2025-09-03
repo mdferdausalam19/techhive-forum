@@ -1,16 +1,17 @@
 import React, { useState } from "react";
 import AdminPageHeader from "../../components/admin/AdminPageHeader";
 import AdminTable from "../../components/admin/AdminTable";
-import { FiBell, FiSearch, FiEdit2, FiTrash2 } from "react-icons/fi";
+import { FiBell, FiSearch } from "react-icons/fi";
 import AnnouncementsModal from "../../components/admin/AnnouncementsModal";
 import EditAnnouncementModal from "../../components/admin/EditAnnouncementModal";
 import DeleteAnnouncementModal from "../../components/admin/DeleteAnnouncementModal";
 import useAuth from "../../hooks/useAuth";
-import useAxiosCommon from "../../hooks/useAxiosCommon";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
 import { toast } from "react-hot-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import LoadingSpinner from "../../components/shared/LoadingSpinner";
 import { format } from "date-fns";
+import { useMutation } from "@tanstack/react-query";
 
 export default function AnnouncementsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -19,7 +20,7 @@ export default function AnnouncementsPage() {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [selectedAnnouncement, setSelectedAnnouncement] = useState(null);
   const { user } = useAuth();
-  const axiosCommon = useAxiosCommon();
+  const axiosSecure = useAxiosSecure();
   const queryClient = useQueryClient();
   const [newAnnouncement, setNewAnnouncement] = useState({
     title: "",
@@ -38,8 +39,25 @@ export default function AnnouncementsPage() {
   const { data: announcements = [], isLoading } = useQuery({
     queryKey: ["announcements"],
     queryFn: async () => {
-      const { data } = await axiosCommon.get("/announcements");
+      const { data } = await axiosSecure.get("/announcements");
       return data;
+    },
+  });
+
+  const { mutateAsync: createAnnouncement } = useMutation({
+    mutationFn: async (announcement) => {
+      const { data } = await axiosSecure.post(
+        "/admin/announcements",
+        announcement
+      );
+      return data;
+    },
+    onSuccess: () => {
+      toast.success("Announcement created successfully!");
+      queryClient.invalidateQueries(["announcements"]);
+    },
+    onError: (err) => {
+      toast.error(err.message);
     },
   });
 
@@ -65,8 +83,7 @@ export default function AnnouncementsPage() {
         role: "Admin",
         visibility: "private",
       };
-      axiosCommon.post("/admin/announcements", announcement);
-      toast.success("Announcement created successfully!");
+      createAnnouncement(announcement);
       setNewAnnouncement({
         title: "",
         content: "",
@@ -100,7 +117,7 @@ export default function AnnouncementsPage() {
 
   const handleEdit = async (updatedAnnouncement) => {
     try {
-      await axiosCommon.put(`/admin/announcements/${updatedAnnouncement._id}`, {
+      await axiosSecure.put(`/admin/announcements/${updatedAnnouncement._id}`, {
         ...updatedAnnouncement,
       });
       await queryClient.invalidateQueries(["announcements"]);
@@ -116,7 +133,7 @@ export default function AnnouncementsPage() {
     if (!selectedAnnouncement) return;
 
     try {
-      await axiosCommon.delete(
+      await axiosSecure.delete(
         `/admin/announcements/${selectedAnnouncement._id}`
       );
       await queryClient.invalidateQueries(["announcements"]);

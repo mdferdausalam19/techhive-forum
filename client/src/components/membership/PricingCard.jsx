@@ -1,3 +1,6 @@
+import useRole from "../../hooks/useRole";
+import LoadingSpinner from "../shared/LoadingSpinner";
+
 const features = [
   { name: "Access to Public Forums", free: true, premium: true },
   { name: "Create Posts", free: true, premium: true },
@@ -9,6 +12,12 @@ const features = [
 ];
 
 export default function PricingCard({ onUpgrade }) {
+  const { role, isLoading } = useRole();
+
+  if (isLoading) {
+    return <LoadingSpinner />;
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-lg p-8 mb-10 border border-blue-100">
@@ -61,12 +70,16 @@ export default function PricingCard({ onUpgrade }) {
           </table>
         </div>
         <div className="text-center">
-          <button
-            onClick={onUpgrade}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200 ease-in-out transform hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
-            Upgrade Now
-          </button>
+          {role === "General" ? (
+            <button
+              onClick={onUpgrade}
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition duration-200 ease-in-out transform hover:-translate-y-1 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            >
+              Upgrade Now
+            </button>
+          ) : (
+            ""
+          )}
         </div>
       </div>
     </div>

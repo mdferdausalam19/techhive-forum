@@ -5,22 +5,19 @@ import {
   FiAlertTriangle,
   FiSearch,
   FiFilter,
-  FiEye,
-  FiCheck,
-  FiX,
   FiMessageSquare,
-  FiUserX,
 } from "react-icons/fi";
 import { useQuery } from "@tanstack/react-query";
-import useAxiosCommon from "../../hooks/useAxiosCommon";
 import { toast } from "react-hot-toast";
 import LoadingSpinner from "../../components/shared/LoadingSpinner";
 import { IoWarningOutline } from "react-icons/io5";
 import WarningModal from "../../components/admin/WarningModal";
 import { useQueryClient } from "@tanstack/react-query";
+import useAxiosSecure from "../../hooks/useAxiosSecure";
+import { useMutation } from "@tanstack/react-query";
 
 export default function ReportedCommentsPage() {
-  const axiosCommon = useAxiosCommon();
+  const axiosSecure = useAxiosSecure();
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -31,19 +28,28 @@ export default function ReportedCommentsPage() {
     useQuery({
       queryKey: ["reported-comments"],
       queryFn: async () => {
-        const { data } = await axiosCommon.get("/admin/reported-comments");
+        const { data } = await axiosSecure.get("/admin/reported-comments");
         return data;
       },
     });
 
+  const { mutateAsync: warnComment } = useMutation({
+    mutationFn: async (commentId) => {
+      const { data } = await axiosSecure.put(`/admin/warn/${commentId}`);
+      return data;
+    },
+    onSuccess: () => {
+      toast.success("Warning sent successfully");
+      queryClient.invalidateQueries(["reported-comments"]);
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+
   const handleSendWarning = async () => {
     try {
-      await axiosCommon.put(`/admin/warn/${selectedComment._id}`);
-      await queryClient.invalidateQueries(["reported-comments"]);
-      toast.success("Warning sent successfully");
-    } catch (error) {
-      console.error("Failed to send warning:", error);
-      toast.error("Failed to send warning. Please try again.");
+      await warnComment(selectedComment._id);
     } finally {
       setWarningModalOpen(false);
     }

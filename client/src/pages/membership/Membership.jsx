@@ -45,7 +45,7 @@ export default function Membership() {
       toast.success("Payment successful!");
       setIsLoading(false);
       setIsModalOpen(false);
-      navigate("/posts");
+      navigate("/");
     } catch (error) {
       console.error("Payment failed:", error);
       toast.error("Payment failed!");
