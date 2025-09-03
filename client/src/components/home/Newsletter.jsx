@@ -1,9 +1,11 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
+import useAxiosCommon from "../../hooks/useAxiosCommon";
 
 export default function Newsletter() {
   const [email, setEmail] = useState("");
   const [isSubscribing, setIsSubscribing] = useState(false);
+  const axiosCommon = useAxiosCommon();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,13 +17,22 @@ export default function Newsletter() {
     setIsSubscribing(true);
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      toast.success("Successfully subscribed to our newsletter!");
-      setEmail("");
+      const newsletterInfo = {
+        email,
+        timestamp: new Date().toISOString(),
+      };
+
+      const { data } = await axiosCommon.post("/newsletter", newsletterInfo);
+      if (data.success) {
+        toast.success(data.message);
+      } else {
+        toast.error(data.message);
+      }
     } catch (error) {
       toast.error("Failed to subscribe. Please try again.");
       console.error("Failed to subscribe:", error);
     } finally {
+      setEmail("");
       setIsSubscribing(false);
     }
   };
