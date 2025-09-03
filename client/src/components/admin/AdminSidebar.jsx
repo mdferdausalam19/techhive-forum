@@ -9,6 +9,7 @@ import {
   FiChevronLeft,
   FiChevronRight,
   FiDollarSign,
+  FiMail,
 } from "react-icons/fi";
 
 export default function AdminSidebar({ onNavigate }) {
@@ -50,6 +51,11 @@ export default function AdminSidebar({ onNavigate }) {
       to: "/admin/announcements",
       icon: <FiBell className="w-5 h-5" />,
       label: "Announcements",
+    },
+    {
+      to: "/admin/newsletter",
+      icon: <FiMail className="w-5 h-5" />,
+      label: "Subscribers",
     },
   ];
 

@@ -21,6 +21,7 @@ import ReportedCommentsPage from "../pages/admin/ReportedCommentsPage";
 import AnnouncementsPage from "../pages/admin/AnnouncementsPage";
 import PaymentsPage from "../pages/admin/PaymentsPage";
 import AdminRoute from "./AdminRoute";
+import NewsletterSubscribers from "../pages/admin/NewsletterSubscribers";
 
 export const router = createBrowserRouter([
   {
@@ -156,6 +157,16 @@ export const router = createBrowserRouter([
           <PrivateRoute>
             <AdminRoute>
               <AnnouncementsPage />
+            </AdminRoute>
+          </PrivateRoute>
+        ),
+      },
+      {
+        path: "newsletter",
+        element: (
+          <PrivateRoute>
+            <AdminRoute>
+              <NewsletterSubscribers />
             </AdminRoute>
           </PrivateRoute>
         ),

@@ -1,11 +1,33 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import useAxiosCommon from "../../hooks/useAxiosCommon";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function Newsletter() {
   const [email, setEmail] = useState("");
   const [isSubscribing, setIsSubscribing] = useState(false);
   const axiosCommon = useAxiosCommon();
+  const queryClient = useQueryClient();
+
+  const { mutateAsync: subscribeToNewsletter } = useMutation({
+    mutationFn: async (email) => {
+      const { data } = await axiosCommon.post("/newsletter/subscribe", {
+        email,
+      });
+      return data;
+    },
+    onSuccess: (data) => {
+      if (data.success) {
+        toast.success(data.message);
+      } else {
+        toast.error(data.message);
+      }
+      queryClient.invalidateQueries({ queryKey: ["newsletterSubscribers"] });
+    },
+    onError: () => {
+      toast.error("Failed to subscribe. Please try again.");
+    },
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,19 +39,8 @@ export default function Newsletter() {
     setIsSubscribing(true);
 
     try {
-      const newsletterInfo = {
-        email,
-        timestamp: new Date().toISOString(),
-      };
-
-      const { data } = await axiosCommon.post("/newsletter", newsletterInfo);
-      if (data.success) {
-        toast.success(data.message);
-      } else {
-        toast.error(data.message);
-      }
+      await subscribeToNewsletter(email);
     } catch (error) {
-      toast.error("Failed to subscribe. Please try again.");
       console.error("Failed to subscribe:", error);
     } finally {
       setEmail("");
