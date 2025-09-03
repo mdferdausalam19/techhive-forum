@@ -68,6 +68,7 @@ async function run() {
     const reportsCollection = database.collection("reports");
     const paymentsCollection = database.collection("payments");
     const announcementsCollection = database.collection("announcements");
+    const newsletterCollection = database.collection("newsletter");
 
     // Middleware to verify user role
     const verifyUserRole = (...allowedRoles) => {
@@ -970,6 +971,32 @@ async function run() {
         }
       }
     );
+
+    // API route to add newsletter
+    app.post("/newsletter", async (req, res) => {
+      try {
+        const newsletterInfo = req.body;
+        const query = { email: newsletterInfo.email };
+        const existingUser = await newsletterCollection.findOne(query);
+        if (existingUser) {
+          return res.status(200).json({
+            success: false,
+            message: "You are already subscribed to our newsletter!",
+          });
+        }
+        const result = await newsletterCollection.insertOne(newsletterInfo);
+        res.status(200).json({
+          success: true,
+          message: "Successfully subscribed to our newsletter!",
+          newsletter: result.insertedId,
+        });
+      } catch (err) {
+        console.error("Error adding newsletter: ", err.message);
+        res.status(500).json({
+          message: "Failed to subscribe to our newsletter.",
+        });
+      }
+    });
 
     console.log("Connected to MongoDB successfully!");
   } catch (err) {
