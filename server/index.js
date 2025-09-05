@@ -163,22 +163,51 @@ async function run() {
     app.post("/users", async (req, res) => {
       try {
         const user = req.body;
-        const query = { email: user.email };
 
-        // if existing user try to sign in again
-        const existingUser = await usersCollection.findOne(query);
-        if (existingUser) {
-          return res.status(200).json({
-            message: "Registered user found!",
+        if (!user.uid || !user.email) {
+          return res.status(400).json({
+            success: false,
+            message: "Missing required fields: uid and email are required",
           });
         }
-        const result = await usersCollection.insertOne({
-          ...user,
+
+        const query = { uid: user.uid };
+        const existingUser = await usersCollection.findOne(query);
+
+        if (existingUser) {
+          if (
+            (!existingUser.name || existingUser.name === "New User") &&
+            user.name
+          ) {
+            const updateResult = await usersCollection.updateOne(
+              { _id: existingUser._id },
+              {
+                $set: {
+                  name: user.name,
+                },
+              }
+            );
+          }
+          return res.status(200).json({
+            success: true,
+            message: "User processed successfully",
+            isNew: false,
+          });
+        }
+
+        const newUser = {
+          uid: user.uid,
+          name: user.name || "New User",
+          email: user.email,
+          avatar: user.avatar || "https://i.ibb.co/9H2PJ7h2/d43801412989.jpg",
+          role: user.role || "General",
+          badge: user.badge || "Bronze",
           timestamp: Date.now(),
-        });
+        };
+
+        const result = await usersCollection.insertOne(newUser);
         res.status(201).json({
           message: "User added successfully!",
-          user: result.insertedId,
         });
       } catch (err) {
         console.error("Error adding user: ", err.message);
