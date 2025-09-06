@@ -93,7 +93,7 @@ export default function MembershipModal({ isOpen, onClose, onConfirm }) {
       onClick={handleOverlayClick}
     >
       <div
-        className="w-full max-w-md rounded-2xl bg-white shadow-xl transform transition-all duration-300 scale-100 opacity-100"
+        className="w-full max-w-md rounded-2xl bg-white shadow-xl transform transition-all duration-300 scale-100 opacity-100 max-h-[90vh] overflow-y-auto"
         role="dialog"
         aria-modal="true"
         aria-labelledby="modal-title"
