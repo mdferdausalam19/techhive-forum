@@ -14,7 +14,7 @@ import useRole from "../../hooks/useRole";
 
 export default function Navbar() {
   const { user, signOutUser, loading } = useAuth();
-  const { role } = useRole();
+  const { role, isLoading: roleLoading } = useRole();
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
@@ -70,8 +70,9 @@ export default function Navbar() {
   const profileMenuItems = [
     { name: "Create Post", href: "/create-post", icon: FaPlus },
     { name: "My Posts", href: "/my-posts", icon: FaFileAlt },
-    { name: "Profile", href: "/profile", icon: FaUser },
   ];
+
+  console.log(role);
 
   return (
     <nav className="bg-white/95 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50 shadow-sm">
@@ -160,7 +161,7 @@ export default function Navbar() {
 
           {/* Desktop User Section */}
           <div className="hidden md:flex items-center space-x-4">
-            {loading ? (
+            {loading || roleLoading ? (
               <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent"></div>
             ) : user ? (
               <div className="relative" ref={dropdownRef}>
@@ -241,21 +242,34 @@ export default function Navbar() {
                       Dashboard
                     </Link>
                   )}
-                  {profileMenuItems.map((item, index) => {
-                    const IconComponent = item.icon;
-                    return (
-                      <Link
-                        key={item.name}
-                        to={item.href}
-                        className="flex items-center px-4 py-3 text-sm text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 border-l-2 border-transparent hover:border-blue-500"
-                        onClick={() => setProfileDropdownOpen(false)}
-                        style={{ animationDelay: `${index * 50}ms` }}
-                      >
-                        <IconComponent className="w-4 h-4 mr-3 text-gray-400" />
-                        {item.name}
-                      </Link>
-                    );
-                  })}
+
+                  {(role === "Premium" || role === "General") &&
+                    profileMenuItems.map((item, index) => {
+                      const IconComponent = item.icon;
+                      return (
+                        <Link
+                          key={item.name}
+                          to={item.href}
+                          className="flex items-center px-4 py-3 text-sm text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 border-l-2 border-transparent hover:border-blue-500"
+                          onClick={() => setProfileDropdownOpen(false)}
+                          style={{ animationDelay: `${index * 50}ms` }}
+                        >
+                          <IconComponent className="w-4 h-4 mr-3 text-gray-400" />
+                          {item.name}
+                        </Link>
+                      );
+                    })}
+
+                  {user && (
+                    <Link
+                      to="/profile"
+                      className="flex items-center px-4 py-3 text-sm text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 border-l-2 border-transparent hover:border-blue-500"
+                      onClick={() => setProfileDropdownOpen(false)}
+                    >
+                      <FaUser className="w-4 h-4 mr-3 text-gray-400" />
+                      Profile
+                    </Link>
+                  )}
 
                   <div className="border-t border-gray-100 my-1"></div>
 
@@ -329,7 +343,7 @@ export default function Navbar() {
             )}
 
             {/* Mobile User Section */}
-            {loading ? (
+            {loading || roleLoading ? (
               <div className="flex justify-center py-4">
                 <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent"></div>
               </div>
@@ -393,24 +407,36 @@ export default function Navbar() {
                       Dashboard
                     </Link>
                   )}
-                  {profileMenuItems.map((item, index) => {
-                    const IconComponent = item.icon;
-                    return (
-                      <Link
-                        key={item.name}
-                        to={item.href}
-                        className="flex items-center text-gray-600 hover:text-blue-600 transition-all duration-200 hover:bg-blue-50 px-4 py-2 rounded-md border-l-2 border-transparent hover:border-blue-400 transform hover:translate-x-1"
-                        onClick={() => {
-                          setMobileMenuOpen(false);
-                          setMobileProfileOpen(false);
-                        }}
-                        style={{ animationDelay: `${index * 100}ms` }}
-                      >
-                        <IconComponent className="w-4 h-4 mr-3 text-gray-400" />
-                        {item.name}
-                      </Link>
-                    );
-                  })}
+                  {(role === "Premium" || role === "General") &&
+                    profileMenuItems.map((item, index) => {
+                      const IconComponent = item.icon;
+                      return (
+                        <Link
+                          key={item.name}
+                          to={item.href}
+                          className="flex items-center text-gray-600 hover:text-blue-600 transition-all duration-200 hover:bg-blue-50 px-4 py-2 rounded-md border-l-2 border-transparent hover:border-blue-400 transform hover:translate-x-1"
+                          onClick={() => {
+                            setMobileMenuOpen(false);
+                            setMobileProfileOpen(false);
+                          }}
+                          style={{ animationDelay: `${index * 100}ms` }}
+                        >
+                          <IconComponent className="w-4 h-4 mr-3 text-gray-400" />
+                          {item.name}
+                        </Link>
+                      );
+                    })}
+
+                  {user && (
+                    <Link
+                      to="/profile"
+                      className="flex items-center px-4 py-3 text-sm text-gray-700 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 border-l-2 border-transparent hover:border-blue-500"
+                      onClick={() => setProfileDropdownOpen(false)}
+                    >
+                      <FaUser className="w-4 h-4 mr-3 text-gray-400" />
+                      Profile
+                    </Link>
+                  )}
 
                   <button
                     onClick={handleSignOut}
